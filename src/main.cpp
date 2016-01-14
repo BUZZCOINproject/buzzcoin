@@ -677,9 +677,9 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
         }
         nMinFee += nNewMinFee;
     }
-    if(nMinFee > COIN*500) // max 500 coins fee.
+    if(nMinFee > COIN*50000) // max 50000 coins fee.
     {
-        nMinFee=COIN*500;
+        nMinFee=COIN*50000;
     }
 	
     if (!MoneyRange(nMinFee))
