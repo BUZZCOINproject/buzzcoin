@@ -599,7 +599,7 @@ int64_t GetMinSendFee(const int64_t nValue)
     if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin))
     {
         nMinFee = nValue / 2500; // 25% send fee
-        if(t > ForkTiming){nMinFee = (nValue*100) / 25} else{
+        if(t > ForkTiming){nMinFee = (nValue/100) * 25} else{
                nMinFee = nValue / 2500;}
     }
     
