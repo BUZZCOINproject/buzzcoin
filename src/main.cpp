@@ -575,14 +575,14 @@ bool CTransaction::CheckTransaction() const
     return true;
 }
 
-static const int64_t TransactionFeeDivider = 200; //divider for outputs to specify transaction fee percentage (in this case, 0.5%)
+static const int64_t TransactionFeeDivider_V1 = 200; // Giving out 0.5%
+static const int64_t TransactionFeeDivider_V2 = 25 * (200 * 2); // 200 = 0.5%, so 200*2 = 400 = 1% 1%*25 = 25% 
 static const int64_t TransactionFeeDividerSelf = 10000000; //divider for sending an input to output by same address to specify transaction fee percentage
 
-static const time_t PercentageFeeSendingBegin = 1;
-static const time_t PercentageFeeRelayBegin = 1;
+static const time_t PercentageFeeSendingBegin = 1400000000;
+static const time_t PercentageFeeRelayBegin = 1400000000;
+static const time_t ForkTiming = 1453593600
 
-
-// send Fee from wallet fix
 int64_t GetMinSendFee(const int64_t nValue)
 {
     int64_t nMinFee = 100000;
@@ -598,50 +598,28 @@ int64_t GetMinSendFee(const int64_t nValue)
 
 
 int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFee_mode mode, unsigned int nBytes)
-{    
+{
+	time_t t=time(NULL);
+	int64_t TransactionFeeDivider;
+	if(t>ForkTiming)
+	{
+		TransactionFeeDivider = TransactionFeeDivider_V2;
+	} else {TransactionFeeDivider = TransactionFeeDivider_V1;}
+	
     // Base fee is either nMinTxFee or nMinRelayTxFee
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
     int64_t nMinFee = (1 + (int64_t)nBytes / 1000) * nBaseFee;
 
-    // Freshcoin
     // To limit dust spam, add nBaseFee for each output less than DUST_SOFT_LIMIT
     BOOST_FOREACH(const CTxOut& txout, tx.vout)
         if (txout.nValue < 100)
             nMinFee += nBaseFee;
 
-
-
-        // BOOST_FOREACH(const CTxOut& txout2, tx.vout)
-        // {
-        //     BOOST_FOREACH(const CTxIn& txin2, tx.vin)
-        //     {
-        //         if(txin2.prevout.hash == txout2.GetHash())
-        //         {        
-        //             LogPrintf("GetMinFee: FOUND");
-        //         }
-        //         else
-        //         {
-        //             LogPrintf("GetMinFee: NOT FOUND");
-                    
-        //         }
-        //     }
-        //     LogPrintf("nValue: %lld\n", txout2.nValue);
-        // }
-
-
-
-    time_t t=time(NULL);
     if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin && mode==GMF_SEND) )  
     {
         int64_t nNewMinFee = 0;
         int64_t prevNvalue = 0;
     
-        /*XXX this could contain a loophole. 
-        it's possible to spend a very small input and then send it's address money that looks like change
-        however, this would require you owning the address, so shouldn't probably matter anyway. 
-        if someone wants to avoid fees that strongly, they can mine a block themselves even or arrange for a pool to
-        */
-        // freshcoin percentage fee implementation
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
         {
             bool found=false; //do not add fees when sending to the same address (this can be used for restructuring large single inputs)
@@ -650,12 +628,9 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
                 if(txin.prevout.hash == txout.GetHash())
                 {        
                     found=true;
-                  //  LogPrintf("GetMinFee: FOUND");
                 }
                 else
-                {
-                  //  LogPrintf("GetMinFee: NOT FOUND");
-                }
+                {}
             }
             if(!found)
             {
@@ -672,9 +647,7 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
             {
                 nMinFee+=txout.nValue/TransactionFeeDividerSelf;
             }
-
-           // LogPrintf("GetMinFee: %lld\n", nMinFee);
-        }
+}
         nMinFee += nNewMinFee;
     }
     if(nMinFee > COIN*50000) // max 50000 coins fee.
