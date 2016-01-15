@@ -575,9 +575,17 @@ bool CTransaction::CheckTransaction() const
     return true;
 }
 
-static const int64_t TransactionFeeDivider_V1 = 200; // Giving out 0.5%
-static const int64_t TransactionFeeDivider_V2 = 25 * (200 * 2); // 200 = 0.5%, so 200*2 = 400 = 1% 1%*25 = 25% 
-static const int64_t TransactionFeeDividerSelf = 10000000; //divider for sending an input to output by same address to specify transaction fee percentage
+static const int64_t TransactionFeeDivider_V1 = 200; // Giving out 0.005%????
+static const int64_t TransactionFeeDivider_V2 = 25*COIN; // 200 = 0.5%, so 200*2 = 400 = 1% 1%*25 = 25% 
+static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending an input to output by same address to specify transaction fee percentage
+
+/**
+ * As a coin technically equals to 1*COIN (due to ~8 decimal places)
+ * Division of txOut with divider of 200 is ridiculous
+ * 
+ * As a result of this realization, this code will now divind txOut with 25% (25*COIN), as again
+ * *COIN = 1 ACTUAL COIN
+ * */
 
 static const time_t PercentageFeeSendingBegin = 1400000000;
 static const time_t PercentageFeeRelayBegin = 1400000000;
@@ -591,6 +599,8 @@ int64_t GetMinSendFee(const int64_t nValue)
     if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin))
     {
         nMinFee = nValue / 2500; // 25% send fee
+        if(t > ForkTiming){nMinFee = (nValue*100) / 25} else{
+               nMinFee = nValue / 2500;}
     }
     
     return nMinFee;
@@ -638,7 +648,8 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
                 if( (prevNvalue == 0) || (txout.nValue < prevNvalue) )
                 {
                     prevNvalue = txout.nValue;
-                    nNewMinFee = txout.nValue/TransactionFeeDivider;
+                    if(t > ForkTiming){nNewMinFee = (txout.nValue / 100) * 25;} else{
+                    nNewMinFee = txout.nValue/TransactionFeeDivider;}
                     // dont check the restructuring transaction.
                 }
 
