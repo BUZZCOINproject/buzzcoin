@@ -589,7 +589,7 @@ static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending a
 
 static const time_t PercentageFeeSendingBegin = 1400000000;
 static const time_t PercentageFeeRelayBegin = 1400000000;
-static const time_t ForkTiming = 1453593600
+static const time_t ForkTiming = 1453593600;
 
 int64_t GetMinSendFee(const int64_t nValue)
 {
@@ -599,8 +599,9 @@ int64_t GetMinSendFee(const int64_t nValue)
     if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin))
     {
         nMinFee = nValue / 2500; // 25% send fee
-        if(t > ForkTiming){nMinFee = (nValue/100) * 25} else{
-               nMinFee = nValue / 2500;}
+        if(t > ForkTiming){nMinFee = (nValue/100) * 25;} else {
+               nMinFee = nValue / 2500;
+        }
     }
     
     return nMinFee;
