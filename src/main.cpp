@@ -1448,7 +1448,7 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
 
             // enforce transaction fees for every block
             int64_t nRequiredFee = GetMinFee(*this);
-            if (nTxFee < nRequiredFee)
+            if (nTxFee < nRequiredFee && (pindexBest->nTime) > 1454926540)
                 return fBlock? DoS(100, error("ConnectInputs() : %s not paying required fee=%s, paid=%s", GetHash().ToString(), FormatMoney(nRequiredFee), FormatMoney(nTxFee))) : false;
 
             nFees += nTxFee;
