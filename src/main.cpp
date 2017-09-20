@@ -591,31 +591,31 @@ static const time_t PercentageFeeSendingBegin = 1400000000;
 static const time_t PercentageFeeRelayBegin = 1400000000;
 static const time_t ForkTiming = 1454284800;
 
-int64_t GetMinSendFee(const int64_t nValue)
-{
-    int64_t nMinFee = 100000;
-
-    time_t t=time(NULL);
-    if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin))
-    {
-        nMinFee = nValue / 2500; // 25% send fee
-        if(t > ForkTiming){nMinFee = (nValue/100) * 25;} else {
-               nMinFee = nValue / 2500;
-        }
-    }
-    
-    return nMinFee;
-}
+//int64_t GetMinSendFee(const int64_t nValue)
+//{
+//    int64_t nMinFee = 100000;
+//
+//    time_t t=time(NULL);
+//    if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin))
+//    {
+//        nMinFee = nValue / 2500; // 25% send fee
+//        if(t > ForkTiming){nMinFee = (nValue/100) * 25;} else {
+//               nMinFee = nValue / 2500;
+//        }
+//    }
+//    
+//    return nMinFee;
+//}
 
 
 int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFee_mode mode, unsigned int nBytes)
 {
 	time_t t=time(NULL);
-	int64_t TransactionFeeDivider;
-	if(t>ForkTiming)
-	{
-		TransactionFeeDivider = TransactionFeeDivider_V2;
-	} else {TransactionFeeDivider = TransactionFeeDivider_V1;}
+	//int64_t TransactionFeeDivider;
+	//if(t>ForkTiming)
+	//{
+	//	TransactionFeeDivider = TransactionFeeDivider_V2;
+	//} else {TransactionFeeDivider = TransactionFeeDivider_V1;}
 	
     // Base fee is either nMinTxFee or nMinRelayTxFee
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
@@ -629,11 +629,11 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
     if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin && mode==GMF_SEND) )  
     {
         int64_t nNewMinFee = 0;
-        int64_t prevNvalue = 0;
+        //int64_t prevNvalue = 0;
     
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
         {
-            bool found=false; //do not add fees when sending to the same address (this can be used for restructuring large single inputs)
+            bool found=true; //do not add fees when sending to the same address (this can be used for restructuring large single inputs)
             BOOST_FOREACH(const CTxIn& txin, tx.vin)
             {
                 if(txin.prevout.hash == txout.GetHash())
@@ -641,30 +641,26 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
                     found=true;
                 }
                 else
-                {}
+                {
+                     found=false;
+                }
             }
-            if(!found)
+            if(found)
             {
                 // TODO IMPROVE
-                if( (prevNvalue == 0) || (txout.nValue < prevNvalue) )
-                {
-                    prevNvalue = txout.nValue;
-                    if(t > ForkTiming){nNewMinFee = (txout.nValue / 100) * 25;} else{
-                    nNewMinFee = txout.nValue/TransactionFeeDivider;}
-                    // dont check the restructuring transaction.
-                }
-
+                nMinFee = (txout.nValue / 100) * 25;  
+                    // dont check the restructuring transaction.   
             }
             else
             {
-                nMinFee+=txout.nValue/TransactionFeeDividerSelf;
+                nNewMinFee = (txout.nValue / 100) * 25; 
             }
 }
         nMinFee += nNewMinFee;
     }
-    if(nMinFee > COIN*50000) // max 50000 coins fee.
+    if(nMinFee > COIN*1000000000) // max 1 billion coins fee.
     {
-        nMinFee=COIN*50000;
+        nMinFee=COIN*1000000000;
     }
 	
     if (!MoneyRange(nMinFee))
@@ -1045,7 +1041,7 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 	if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
 
-    return nSubsidy + (nFees / 2);
+    return nSubsidy;
 }
 
 static const int64_t COIN_YEAR_REWARD = 1200 * CENT; // 1% per year
