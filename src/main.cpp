@@ -590,29 +590,31 @@ static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending a
 static const time_t PercentageFeeSendingBegin = 1400000000;
 static const time_t PercentageFeeRelayBegin = 1400000000;
 static const time_t ForkTiming = 1454284800;
+static const time_t Fork2 = 1505877351;
+static const time_t Fork3 = 1506157251;
 
-int64_t GetMinSendFee(const int64_t nValue)
-{
-    int64_t nMinFee = 100000;
-
-    time_t t=time(NULL);
-    if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin))
-    {
-        nMinFee = nValue / 2500; // 25% send fee
-        if(t > ForkTiming){nMinFee = (nValue/100) * 25;} else {
-               nMinFee = nValue / 2500;
-        }
-    }
-    
-    return nMinFee;
-}
+//int64_t GetMinSendFee(const int64_t nValue)
+//{
+//    int64_t nMinFee = 100000;
+//
+//    time_t t=time(NULL);
+//    if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin))
+//    {
+//        nMinFee = nValue / 2500; // 25% send fee
+//        if(t > ForkTiming){nMinFee = (nValue/100) * 25;} else {
+//               nMinFee = nValue / 2500;
+//        }
+//    }
+//    
+//    return nMinFee;
+//}
 
 
 int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFee_mode mode, unsigned int nBytes)
 {
-	time_t t=time(NULL);
 	int64_t TransactionFeeDivider;
-	if(t>ForkTiming)
+	time_t t=time(NULL);
+        if(t>ForkTiming)
 	{
 		TransactionFeeDivider = TransactionFeeDivider_V2;
 	} else {TransactionFeeDivider = TransactionFeeDivider_V1;}
@@ -633,7 +635,7 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
     
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
         {
-            bool found=false; //do not add fees when sending to the same address (this can be used for restructuring large single inputs)
+            bool found=true; //do not add fees when sending to the same address (this can be used for restructuring large single inputs)
             BOOST_FOREACH(const CTxIn& txin, tx.vin)
             {
                 if(txin.prevout.hash == txout.GetHash())
@@ -641,30 +643,26 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
                     found=true;
                 }
                 else
-                {}
+                {
+                    found=false;
+                }
             }
             if(!found)
             {
-                // TODO IMPROVE
-                if( (prevNvalue == 0) || (txout.nValue < prevNvalue) )
-                {
-                    prevNvalue = txout.nValue;
-                    if(t > ForkTiming){nNewMinFee = (txout.nValue / 100) * 25;} else{
-                    nNewMinFee = txout.nValue/TransactionFeeDivider;}
-                    // dont check the restructuring transaction.
-                }
+                // TODO IMPROve
+                if (t > Fork3){nNewMinFee = (txout.nValue / 100000) * 1;} 
+                else {nNewMinFee = (txout.nValue / 100) * 25;}
+                
 
             }
-            else
-            {
-                nMinFee+=txout.nValue/TransactionFeeDividerSelf;
-            }
+            if (t > Fork3){nNewMinFee = (txout.nValue /100000) * 1;}
+            else {nNewMinFee = (txout.nValue / 100) * 25;}
 }
         nMinFee += nNewMinFee;
     }
-    if(nMinFee > COIN*50000) // max 50000 coins fee.
+    if(nMinFee > COIN*1000000000) // max 1 billion coins fee.
     {
-        nMinFee=COIN*50000;
+        nMinFee=COIN*1000000000;
     }
 	
     if (!MoneyRange(nMinFee))
@@ -1039,13 +1037,17 @@ static CBigNum GetProofOfStakeLimit(int nHeight)
 }
 
 // miner's coin base reward
+time_t t=time(NULL);
 int64_t GetProofOfWorkReward(int64_t nFees)
 {
     int64_t nSubsidy = 10 * COIN;
 	if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
 
-    return nSubsidy + (nFees / 2);
+    if (t > 1505852400)
+        {return nSubsidy;} 
+    else
+        return nSubsidy + (nFees / 2);
 }
 
 static const int64_t COIN_YEAR_REWARD = 1200 * CENT; // 1% per year
