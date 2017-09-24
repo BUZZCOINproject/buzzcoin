@@ -612,21 +612,12 @@ static const time_t Fork3 = 1506157251;
 
 int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFee_mode mode, unsigned int nBytes)
 {
-<<<<<<< HEAD
 	int64_t TransactionFeeDivider;
 	time_t t=time(NULL);
         if(t>ForkTiming)
 	{
 		TransactionFeeDivider = TransactionFeeDivider_V2;
 	} else {TransactionFeeDivider = TransactionFeeDivider_V1;}
-=======
-	time_t t=time(NULL);
-	//int64_t TransactionFeeDivider;
-	//if(t>ForkTiming)
-	//{
-	//	TransactionFeeDivider = TransactionFeeDivider_V2;
-	//} else {TransactionFeeDivider = TransactionFeeDivider_V1;}
->>>>>>> 5a29ba8f37085c14cfb73ae949d4d04404580ced
 	
     // Base fee is either nMinTxFee or nMinRelayTxFee
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
@@ -640,7 +631,7 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
     if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin && mode==GMF_SEND) )  
     {
         int64_t nNewMinFee = 0;
-        //int64_t prevNvalue = 0;
+        int64_t prevNvalue = 0;
     
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
         {
@@ -653,31 +644,16 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
                 }
                 else
                 {
-<<<<<<< HEAD
                     found=false;
                 }
-=======
-                     found=false;
-                }
-            }
-            if(found)
-            {
-                // TODO IMPROVE
-                nMinFee = (txout.nValue / 100) * 25;  
-                    // dont check the restructuring transaction.   
->>>>>>> 5a29ba8f37085c14cfb73ae949d4d04404580ced
             }
             if(!found)
             {
-<<<<<<< HEAD
                 // TODO IMPROve
                 if (t > Fork3){nNewMinFee = (txout.nValue / 100000) * 1;} 
                 else {nNewMinFee = (txout.nValue / 100) * 25;}
                 
 
-=======
-                nNewMinFee = (txout.nValue / 100) * 25; 
->>>>>>> 5a29ba8f37085c14cfb73ae949d4d04404580ced
             }
             if (t > Fork3){nNewMinFee = (txout.nValue /100000) * 1;}
             else {nNewMinFee = (txout.nValue / 100) * 25;}
@@ -1068,14 +1044,10 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 	if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
 
-<<<<<<< HEAD
     if (t > 1505852400)
         {return nSubsidy;} 
     else
         return nSubsidy + (nFees / 2);
-=======
-    return nSubsidy;
->>>>>>> 5a29ba8f37085c14cfb73ae949d4d04404580ced
 }
 
 static const int64_t COIN_YEAR_REWARD = 1200 * CENT; // 1% per year
