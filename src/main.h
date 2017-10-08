@@ -234,6 +234,11 @@ public:
         SetNull();
     }
 
+    CTransaction(int nVersion, unsigned int nTime, const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout, unsigned int nLockTime)
+    : nVersion(nVersion), nTime(nTime), vin(vin), vout(vout), nLockTime(nLockTime), nDoS(0)
+    {
+    }
+
     IMPLEMENT_SERIALIZE
     (
         READWRITE(this->nVersion);
@@ -861,7 +866,7 @@ public:
     int64_t nMoneySupply;
 
     unsigned int nFlags;  // ppcoin: block index flags
-    enum  
+    enum
     {
         BLOCK_PROOF_OF_STAKE = (1 << 0), // is proof-of-stake block
         BLOCK_STAKE_ENTROPY  = (1 << 1), // entropy bit for stake modifier
