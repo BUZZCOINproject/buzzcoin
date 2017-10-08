@@ -5,6 +5,7 @@ INCLUDEPATH += src src/json src/qt
 QT += network
 DEFINES += ENABLE_WALLET
 DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
+DEFINES += QT_GUI
 CONFIG += no_include_pwd
 CONFIG += thread
 
@@ -29,13 +30,49 @@ UI_DIR = build
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
-    # Mac: compile for maximum compatibility (10.5, 32-bit)
-    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.5 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk
+    # Mac: compile for maximum compatibility (10.8, 32-bit)
+    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.8 -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 
     !windows:!macx {
         # Linux: static link
         LIBS += -Wl,-Bstatic
     }
+}
+
+isEmpty(MINIUPNPC_INCLUDE_PATH) {
+    macx:MINIUPNPC_INCLUDE_PATH = /usr/local/Cellar/miniupnpc/2.0.20170509/include
+}
+
+isEmpty(MINIUPNPC_LIB_PATH) {
+    macx:MINIUPNPC_LIB_PATH = /usr/local/Cellar/miniupnpc/2.0.20170509/lib
+}
+
+isEmpty(OPENSSL_INCLUDE_PATH) {
+    macx:OPENSSL_INCLUDE_PATH = /usr/local/Cellar/openssl/1.0.2l/include
+}
+
+isEmpty(OPENSSL_LIB_PATH) {
+    macx:OPENSSL_LIB_PATH = /usr/local/Cellar/openssl/1.0.2l/lib
+}
+
+isEmpty(BDB_LIB_PATH) {
+    macx:BDB_LIB_PATH = /usr/local/Cellar/berkeley-db@4/4.8.30/lib
+}
+
+isEmpty(BDB_LIB_SUFFIX) {
+    macx:BDB_LIB_SUFFIX = -4.8
+}
+
+isEmpty(BDB_INCLUDE_PATH) {
+    macx:BDB_INCLUDE_PATH = /usr/local/Cellar/berkeley-db@4/4.8.30/include
+}
+
+isEmpty(BOOST_LIB_PATH) {
+    macx:BOOST_LIB_PATH = /usr/local/Cellar/boost/1.65.1/lib
+}
+
+isEmpty(BOOST_INCLUDE_PATH) {
+    macx:BOOST_INCLUDE_PATH = /usr/local/Cellar/boost/1.65.1/include
 }
 
 !win32 {
@@ -364,26 +401,6 @@ isEmpty(BOOST_THREAD_LIB_SUFFIX) {
     else:BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
 }
 
-isEmpty(BDB_LIB_PATH) {
-    macx:BDB_LIB_PATH = /opt/local/lib/db48
-}
-
-isEmpty(BDB_LIB_SUFFIX) {
-    macx:BDB_LIB_SUFFIX = -4.8
-}
-
-isEmpty(BDB_INCLUDE_PATH) {
-    macx:BDB_INCLUDE_PATH = /opt/local/include/db48
-}
-
-isEmpty(BOOST_LIB_PATH) {
-    macx:BOOST_LIB_PATH = /opt/local/lib
-}
-
-isEmpty(BOOST_INCLUDE_PATH) {
-    macx:BOOST_INCLUDE_PATH = /opt/local/include
-}
-
 windows:DEFINES += WIN32
 windows:RC_FILE = src/qt/res/bitcoin-qt.rc
 
@@ -398,16 +415,19 @@ windows:!contains(MINGW_THREAD_BUGFIX, 0) {
     QMAKE_LIBS_QT_ENTRY = -lmingwthrd $$QMAKE_LIBS_QT_ENTRY
 }
 
-macx:HEADERS += src/qt/macdockiconhandler.h
-macx:OBJECTIVE_SOURCES += src/qt/macdockiconhandler.mm
+macx:HEADERS += src/qt/macnotificationhandler.h src/qt/macdockiconhandler.h
+macx:OBJECTIVE_SOURCES += src/qt/macnotificationhandler.mm src/qt/macdockiconhandler.mm
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit
 macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
-macx:ICON = src/qt/res/icons/bitcoin.icns
+macx:ICON = src/qt/res/icons/buzzcoin.icns
 macx:TARGET = "BuzzCoin-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread
 macx:QMAKE_INFO_PLIST = share/qt/Info.plist
+macx:QMAKE_FLAGS_RPATH =
+macx:QMAKE_LFLAGS += -Wl,-rpath,/Users/andrea/Qt/5.6/clang_64/lib
+macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
