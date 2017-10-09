@@ -91,9 +91,9 @@ bool RecvLineIRC(SOCKET hSocket, string& strLine)
     while (!ShutdownRequested())
     {
 	boost::this_thread::interruption_point();
-	
+
         bool fRet = RecvLine(hSocket, strLine);
-	
+
 	if(ShutdownRequested())
 	{
 	    LogPrintf("RecvLineIRC: shutdown requested\n");
@@ -102,7 +102,7 @@ bool RecvLineIRC(SOCKET hSocket, string& strLine)
 
 	boost::this_thread::interruption_point();
         if (fRet)
-        {            
+        {
             vector<string> vWords;
             ParseString(strLine, ' ', vWords);
             if (vWords.size() >= 1 && vWords[0] == "PING")
@@ -235,7 +235,7 @@ void ThreadIRCSeed()
     try
     {
         ThreadIRCSeed2();
-    } 
+    }
     catch (boost::thread_interrupted)
     {
 	LogPrintf("irc thread interrupted.\n");
@@ -247,7 +247,7 @@ void ThreadIRCSeed()
     {
         PrintExceptionContinue(NULL, "ThreadIRCSeed()");
     };
-    
+
     LogPrintf("ThreadIRCSeed exited\n");
 }
 
@@ -319,7 +319,7 @@ void ThreadIRCSeed2()
         if (!fNoListen && GetLocal(addrLocal, &addrIPv4) && nNameRetry<3)
             strMyName = EncodeAddress(GetLocalAddress(&addrConnect));
         if (strMyName == "")
-            strMyName = strprintf("x%"PRIu64"", GetRand(1000000000));
+            strMyName = strprintf("x%" PRIu64 "", GetRand(1000000000));
 
         Send(hSocket, strprintf("NICK %s\r", strMyName.c_str()).c_str());
         Send(hSocket, strprintf("USER %s 8 * : %s\r", strMyName.c_str(), strMyName.c_str()).c_str());
@@ -343,7 +343,7 @@ void ThreadIRCSeed2()
             else
                 return;
         };
-        
+
         nNameRetry = 0;
         MilliSleep(500);
 

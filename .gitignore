@@ -1,3 +1,15 @@
+# temporary build files
+build
+Makefile
+Makefile.*
+BuzzCoin-Qt.app
+.qmake.stash
+Makefile
+qrc_*.cpp
+*.qm
+*.pro.user
+*.dmg
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
