@@ -34,11 +34,8 @@ An executable named `buzzcoin-qt` will be built.
 Windows build instructions:
 
 - Download the `QT Windows SDK`_ and install it. You don't need the Symbian stuff, just the desktop Qt.
-
 - Compile openssl, boost and dbcxx.
-
 - Open the .pro file in QT creator and build as normal (ctrl-B)
-
 .. _`QT Windows SDK`: http://qt-project.org/downloads
 
 
@@ -46,21 +43,20 @@ Windows build instructions:
 --------
 
 - Download and install the `Qt Mac OS X SDK`_. It is recommended to also install Apple's Xcode with UNIX tools.
-
-- Download and install `MacPorts`_.
-
+- Download and install `Brew`_.
 - Execute the following commands in a terminal to get the dependencies:
 
 ```
-sudo port selfupdate
-sudo port install boost db48 miniupnpc
+brew update && brew upgrade
+brew install boost berkeley-db@4 miniupnpc qt
 ```
 
-- Open the .pro file in Qt Creator and build as normal (cmd-B)
+from inside the home directory
 
-.. _`Qt Mac OS X SDK`: http://qt-project.org/downloads
-.. _`MacPorts`: http://www.macports.org/install.php
-
+```
+qmake RELEASE=1 USE_QRCODE=1
+make
+```
 
 - Deploy DMG:
 
@@ -69,7 +65,6 @@ python2.7 contrib/macdeploy/macdeployqtplus -no-strip -dmg BuzzCoin-Qt BuzzCoin-
 ```
 
 ## Build configuration options
-
 ### UPNnP port forwarding
 ---------------------
 

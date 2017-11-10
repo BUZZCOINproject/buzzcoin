@@ -1,4 +1,5 @@
 Copyright (c) 2009-2012 Bitcoin Developers
+Copyright (c) 2017 BUZZ Developers
 Distributed under the MIT/X11 software license, see the accompanying file
 license.txt or http://www.opensource.org/licenses/mit-license.php.  This
 product includes software developed by the OpenSSL Project for use in the
@@ -6,49 +7,37 @@ OpenSSL Toolkit (http://www.openssl.org/).  This product includes cryptographic
 software written by Eric Young (eay@cryptsoft.com) and UPnP software written by
 Thomas Bernard.
 
+# intro
 
-Mac OS X buzzcoind build instructions
-Laszlo Hanyecz <solar@heliacal.net>
-Douglas Huff <dhuff@jrbobdobbs.org>
+See qt-build.md for instructions on building BuzzCoin QT, the graphical user interface.
 
+All of the commands should be executed in Terminal.
 
-See readme-qt.rst for instructions on building BuzzCoin QT, the
-graphical user interface.
-
-Tested on 10.5 and 10.6 intel.  PPC is not supported because it's big-endian.
-
-All of the commands should be executed in Terminal.app.. it's in
-/Applications/Utilities
-
-You need to install XCode with all the options checked so that the compiler and
-everything is available in /usr not just /Developer I think it comes on the DVD
-but you can get the current version from http://developer.apple.com
-
+## lets go!
 
 1.  Clone the github tree to get the source code:
 
-git clone git@github.com:rat4/buzzcoin.git buzzcoin
+```
+git clone https://github.com/buzzcoin-project/BUZZ
+```
 
-2.  Download and install MacPorts from http://www.macports.org/
+2.  Download and install Brew and never look at Macports, ever! https://brew.sh
 
-2a. (for 10.7 Lion)
-    Edit /opt/local/etc/macports/macports.conf and uncomment "build_arch i386"
+3.  Install dependencies from Brew
 
-3.  Install dependencies from MacPorts
-
-sudo port install boost db48 openssl miniupnpc
-
-Optionally install qrencode (and set USE_QRCODE=1):
-sudo port install qrencode
+```
+brew install boost berkeley-db openssl miniupnpc qrencode
+```
 
 4.  Now you should be able to build buzzcoind:
 
+```
 cd buzzcoin/src
 make -f makefile.osx
+```
 
-Run:
+```
   ./buzzcoind --help  # for a list of command-line options.
-Run
   ./buzzcoind -daemon # to start the buzzcoin daemon.
-Run
   ./buzzcoind help # When the daemon is running, to get a list of RPC commands
+```
