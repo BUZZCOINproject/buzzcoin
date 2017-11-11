@@ -1,4 +1,4 @@
-BuzzCoin 0.1.0 BETA
+BuzzCoin v2.1.0.0
 
 Copyright (c) 2013 NovaCoin Developers
 Copyright (c) 2011-2012 PPCoin Developers
