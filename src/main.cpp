@@ -45,7 +45,7 @@ unsigned int nStakeMinAge()
     // TODO: get current block
     // TODO: get current supply
 
-    if (CURRENT_BLOCK % 1200)
+    if (nCurrentBlcuock % 1200)
     {
         nHours = 1;
     }
@@ -1975,7 +1975,7 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge) const
         CBlock block;
         if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
             return false; // unable to read block of previous transaction
-        if (block.GetBlockTime() + nStakeMinAge > nTime)
+        if (block.GetBlockTime() + nStakeMinAge() > nTime)
             continue; // only count coins meeting min age requirement
 
         int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
