@@ -42,10 +42,10 @@ unsigned int nStakeMinAge()
 {
     int nHours = 8;
 
-    // TODO: get current block
-    // TODO: get current supply
+    // TODO: get current block -> nCurrentBlock
+    // TODO: get current supply -> nCurrentSupply
 
-    if (nCurrentBlcuock % 1200)
+    if (nCurrentBlock % 1200)
     {
         nHours = 1;
     }
@@ -1140,10 +1140,10 @@ static const int64_t COIN_YEAR_REWARD = 1200 * CENT; // 1% per year
 // miner's coin stake reward
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 {
-    // TODO: get current coin supply
-    // TODO: get current block
+    // TODO: get current coin supply -> nCurrentSupply
+    // TODO: get current block -> nCurrentBlock
 
-    int nDescalation = COIN_YEAR_REWARD;
+    int nDescalation = 0;
 
     if (nCurrentBlock % 1200)
     {
