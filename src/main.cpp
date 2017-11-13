@@ -38,7 +38,7 @@ set<pair<COutPoint, unsigned int>> setStakeSeen;
 CBigNum bnProofOfStakeLimit(~uint256(0) >> 20);
 CBigNum bnProofOfStakeLimitV2(~uint256(0) >> 20);
 
-unsigned int nStakeMinAge()
+unsigned int GetMinStakeAge()
 {
     int nHours = 8;
 
@@ -1214,7 +1214,7 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
         return 0;
     }
 
-    int64_t nSubsidy = nCoinAge * (COIN_YEAR_REWARD - (COIN_YEAR_REWARD * nDescalation)) * 33 / (365 * 33 + nStakeMinAge());
+    int64_t nSubsidy = nCoinAge * (COIN_YEAR_REWARD - (COIN_YEAR_REWARD * nDescalation)) * 33 / (365 * 33 + GetMinStakeAge());
 
     LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d\n", FormatMoney(nSubsidy), nCoinAge);
 
@@ -2050,7 +2050,7 @@ bool CTransaction::GetCoinAge(CTxDB &txdb, uint64_t &nCoinAge) const
         CBlock block;
         if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
             return false; // unable to read block of previous transaction
-        if (block.GetBlockTime() + nStakeMinAge() > nTime)
+        if (block.GetBlockTime() + GetMinStakeAge() > nTime)
             continue; // only count coins meeting min age requirement
 
         int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
