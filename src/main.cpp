@@ -45,7 +45,7 @@ unsigned int GetMinStakeAge()
     // TODO: get current block -> nCurrentBlock
     // TODO: get current supply -> nCurrentSupply
 
-    if (nCurrentBlock % 1200)
+    if (pindexBest % 1200)
     {
         nHours = 1;
     }
