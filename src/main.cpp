@@ -49,66 +49,66 @@ unsigned int GetMinStakeAge()
     }
     else if (nCurrentSupply >= 5000000000 && nCurrentSupply <= 6000000000)
     {
-        nHours = nHours * 2
+        nHours = nHours * 5
     }
     else if (nCurrentSupply >= 6000000000 && nCurrentSupply <= 7000000000)
     {
-        nHours = nHours * 3
+        nHours = nHours * 6
     }
     else if (nCurrentSupply >= 7000000000 && nCurrentSupply <= 8000000000)
     {
-        nHours = nHours * 4
+        nHours = nHours * 7
     }
     else if (nCurrentSupply >= 8000000000 && nCurrentSupply <= 9000000000)
     {
-        nHours = nHours * 5
+        nHours = nHours * 8
     }
     else if (nCurrentSupply >= 9000000000 && nCurrentSupply <= 10000000000)
     {
-        nHours = nHours * 6
+        nHours = nHours * 9
     }
     else if (nCurrentSupply >= 10000000000 && nCurrentSupply <= 11000000000)
     {
-        nHours = nHours * 7
+        nHours = nHours * 10
     }
     else if (nCurrentSupply >= 11000000000 && nCurrentSupply <= 12000000000)
     {
-        nHours = nHours * 8
+        nHours = nHours * 11
     }
     else if (nCurrentSupply >= 12000000000 && nCurrentSupply <= 13000000000)
     {
-        nHours = nHours * 9
+        nHours = nHours * 12
     }
     else if (nCurrentSupply >= 13000000000 && nCurrentSupply <= 14000000000)
     {
-        nHours = nHours * 10
+        nHours = nHours * 13
     }
     else if (nCurrentSupply >= 14000000000 && nCurrentSupply <= 15000000000)
     {
-        nHours = nHours * 11
+        nHours = nHours * 14
     }
     else if (nCurrentSupply >= 15000000000 && nCurrentSupply <= 16000000000)
     {
-        nHours = nHours * 14
+        nHours = nHours * 15
     }
     else if (nCurrentSupply >= 16000000000 && nCurrentSupply <= 17000000000)
     {
-        nHours = nHours * 15
+        nHours = nHours * 16
     }
     else if (nCurrentSupply >= 17000000000 && nCurrentSupply <= 18000000000)
     {
-        nHours = nHours * 16
+        nHours = nHours * 17
     }
     else if (nCurrentSupply >= 18000000000 && nCurrentSupply <= 19000000000)
     {
-        nHours = nHours * 17
+        nHours = nHours * 18
     }
     else if (nCurrentSupply >= 19000000000 && nCurrentSupply <= 20000000000)
     {
-        nHours = nHours * 18
+        nHours = nHours * 19
     }
 
-    return nHours * 60 * 60; // 8 hours
+    return nHours * 60 * 60;
 }
 
 unsigned int nModifierInterval = 8 * 60; // time to elapse before new modifier is computed
