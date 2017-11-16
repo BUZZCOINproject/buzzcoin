@@ -1124,8 +1124,7 @@ int64_t GetProofOfWorkReward(int64_t nFees)
         return nSubsidy + (nFees / 2);
 }
 
-static const int64_t COIN_YEAR_REWARD = 1200 * CENT; // 1% per year
-// miner's coin stake reward
+// stakers's coin stake reward
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 {
     // TODO: get current coin supply -> nCurrentSupply
@@ -1202,19 +1201,14 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
         return 0;
     }
 
-    int64_t nSubsidy = nCoinAge * (COIN_YEAR_REWARD - (COIN_YEAR_REWARD * nDescalation)) * 33 / (365 * 33 + GetMinStakeAge());
+    int64_t nSubsidy = nCoinAge * GetCoinYearReward(nDescalation) * 33 / (365 * 33 + GetMinStakeAge());
 
     LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d\n", FormatMoney(nSubsidy), nCoinAge);
 
     return nSubsidy;
 }
-<<<<<<< HEAD
-static const int64_t nTargetTimespan = 120;  // 16 mins
-=======
 
 static const int64_t nTargetTimespan = 120; // 16 mins
->>>>>>> ee74acb... psuedo add descaling RoI
-
 //
 // maximum nBits value could possible be required nTime after
 //
