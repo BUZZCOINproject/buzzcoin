@@ -55,12 +55,31 @@ static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20
 inline int64_t GetCoinYearReward(int nDescalation) {
     int nCurrentSupply = pindexBest->nMoneySupply;
 
-    if (nBestHeight % 1200) {
-        return 1200 * CENT;
-    } else {
+    int softForkBlockActivation = 900000; // TO BE DETERMINED
 
+    // if not yet reaching activation block
+    // or if current block is divisible by 1200
+    if (nBestHeight % 1200 || nBestHeight < 900000) {
+        return 1200 * CENT;
     }
+
     return 1200 - (1200 * (nCurrentSupply/MAX_MONEY)) * CENT;
+}
+
+inline int GetMinStakeAge()
+{
+    int nHours = 8;
+    
+    // if not yet reaching activation block
+    // or if current block is divisible by 1200
+    if (nBestHeight % 1200 || nBestHeight < 900000) {
+        return nHours * 60 * 60;
+    }
+
+    int nCurrentSupply = pindexBest->nMoneySupply;
+    int nMultiplier = nCurrentSupply / 1000000
+
+    return (nHours * nMultiplier) * 60 * 60
 }
 
 inline bool IsProtocolV1RetargetingFixed(int nHeight) { return TestNet() || nHeight > 0; }
