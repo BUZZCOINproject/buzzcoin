@@ -1125,81 +1125,8 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 // stakers's coin stake reward
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 {
-    // TODO: get current coin supply -> nCurrentSupply
-    // TODO: get current block -> nCurrentBlock
 
-    int nDescalation = 0;
-
-    if (nCurrentBlock % 1200)
-    {
-        LogPrint("PoS REWARD", "%d block divisible by 1200, reward APR 1200 yearly", nCurrentBlock);
-    }
-    else if (nCurrentSupply >= 5000000000 && nCurrentSupply <= 6000000000)
-    {
-        nDescalation = 5 / 20;
-    }
-    else if (nCurrentSupply >= 6000000000 && nCurrentSupply <= 7000000000)
-    {
-        nDescalation = 6 / 20;
-    }
-    else if (nCurrentSupply >= 7000000000 && nCurrentSupply <= 8000000000)
-    {
-        nDescalation = 7 / 20;
-    }
-    else if (nCurrentSupply >= 8000000000 && nCurrentSupply <= 9000000000)
-    {
-        nDescalation = 8 / 20;
-    }
-    else if (nCurrentSupply >= 9000000000 && nCurrentSupply <= 10000000000)
-    {
-        nDescalation = 9 / 20;
-    }
-    else if (nCurrentSupply >= 10000000000 && nCurrentSupply <= 11000000000)
-    {
-        nDescalation = 10 / 20;
-    }
-    else if (nCurrentSupply >= 11000000000 && nCurrentSupply <= 12000000000)
-    {
-        nDescalation = 11 / 20;
-    }
-    else if (nCurrentSupply >= 12000000000 && nCurrentSupply <= 13000000000)
-    {
-        nDescalation = 12 / 20;
-    }
-    else if (nCurrentSupply >= 13000000000 && nCurrentSupply <= 14000000000)
-    {
-        nDescalation = 13 / 20;
-    }
-    else if (nCurrentSupply >= 14000000000 && nCurrentSupply <= 15000000000)
-    {
-        nDescalation = 14 / 20;
-    }
-    else if (nCurrentSupply >= 15000000000 && nCurrentSupply <= 16000000000)
-    {
-        nDescalation = 15 / 20;
-    }
-    else if (nCurrentSupply >= 16000000000 && nCurrentSupply <= 17000000000)
-    {
-        nDescalation = 16 / 20;
-    }
-    else if (nCurrentSupply >= 17000000000 && nCurrentSupply <= 18000000000)
-    {
-        nDescalation = 17 / 20;
-    }
-    else if (nCurrentSupply >= 18000000000 && nCurrentSupply <= 19000000000)
-    {
-        nDescalation = 18 / 20;
-    }
-    else if (nCurrentSupply >= 19000000000 && nCurrentSupply <= 20000000000)
-    {
-        nDescalation = 19 / 20;
-    }
-    else if (nCurrentSupply >= 20000000000)
-    {
-        return 0;
-    }
-
-    int64_t nSubsidy = nCoinAge * GetCoinYearReward(nDescalation) * 33 / (365 * 33 + GetMinStakeAge());
+    int64_t nSubsidy = nCoinAge * GetCoinYearReward() * 33 / (365 * 33 + GetMinStakeAge());
 
     LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d\n", FormatMoney(nSubsidy), nCoinAge);
 

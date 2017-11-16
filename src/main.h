@@ -53,7 +53,14 @@ static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20
 
 // returns percentage reward per year
 inline int64_t GetCoinYearReward(int nDescalation) {
-    return 1200 - (1200 * nDescalation) * CENT;
+    int nCurrentSupply = pindexBest->nMoneySupply;
+
+    if (nBestHeight % 1200) {
+        return 1200 * CENT;
+    } else {
+
+    }
+    return 1200 - (1200 * (nCurrentSupply/MAX_MONEY)) * CENT;
 }
 
 inline bool IsProtocolV1RetargetingFixed(int nHeight) { return TestNet() || nHeight > 0; }
