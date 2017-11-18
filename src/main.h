@@ -1,7 +1,9 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2017 The BUZZcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef BITCOIN_MAIN_H
 #define BITCOIN_MAIN_H
 
@@ -51,16 +53,32 @@ inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MO
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 
+
+static const int SOFT_FORK_ACTIVATION = 900000; // TO BE DETERMINED
+
 // returns percentage reward per year
 inline int64_t GetCoinYearReward(int nDescalation) {
     int nCurrentSupply = pindexBest->nMoneySupply;
 
-    int softForkBlockActivation = 900000; // TO BE DETERMINED
-
     // if not yet reaching activation block
-    // or if current block is divisible by 1200
-    if (nBestHeight % 1200 || nBestHeight < 900000) {
+    if (nBestHeight < SOFT_FORK_ACTIVATION) {
         return 1200 * CENT;
+    }
+
+    if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
+        return 1200 * CENT;
+    }
+
+    if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
+        return 1200 * CENT;
+    }
+
+    if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
+        return 1200 * CENT;
+    }
+
+    if (nCurrentSupply > 20000000) {
+        return 0 * CENT;
     }
 
     return 1200 - (1200 * (nCurrentSupply/MAX_MONEY)) * CENT;
@@ -69,10 +87,21 @@ inline int64_t GetCoinYearReward(int nDescalation) {
 inline int GetMinStakeAge()
 {
     int nHours = 8;
-    
+
     // if not yet reaching activation block
-    // or if current block is divisible by 1200
-    if (nBestHeight % 1200 || nBestHeight < 900000) {
+    if (nBestHeight < SOFT_FORK_ACTIVATION) {
+        return nHours * 60 * 60;
+    }
+
+    if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
+        return nHours * 60 * 60;
+    }
+
+    if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
+        return nHours * 60 * 60;
+    }
+
+    if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
         return nHours * 60 * 60;
     }
 
