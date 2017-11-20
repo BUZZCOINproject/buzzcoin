@@ -132,7 +132,7 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles);
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
 int64_t GetProofOfWorkReward(int64_t nFees);
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees);
+int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pindex);
 unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime);
 unsigned int ComputeMinStake(unsigned int nBase, int64_t nTime, unsigned int nBlockTime);
 bool IsInitialBlockDownload();
@@ -393,7 +393,7 @@ public:
                        std::map<uint256, CTxIndex>& mapTestPool, const CDiskTxPos& posThisTx,
                        const CBlockIndex* pindexBlock, bool fBlock, bool fMiner, unsigned int flags = STANDARD_SCRIPT_VERIFY_FLAGS);
     bool CheckTransaction() const;
-    bool GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge) const;  // ppcoin: get transaction coin age
+    bool GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge, CBlockIndex* pindex) const;  // ppcoin: get transaction coin age
 
     const CTxOut& GetOutputFor(const CTxIn& input, const MapPrevTx& inputs) const;
 };
@@ -1312,30 +1312,27 @@ protected:
 // mechanisms for coin reward and maturation modification
 //
 
-int nStabilityForkBlock = 875000;
-int StabilitySoftFork() const { return nStabilityForkBlock }
-
 // returns percentage reward per year
-inline int64_t GetCoinYearReward() {
-    int nCurrentSupply = pindexBest->nMoneySupply;
+inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
+    int nCurrentSupply = pindex->nMoneySupply;
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nBestHeight < Params().StabilitySoftFork() && !TestNet()) {
+    if (pindex->nHeight < Params().StabilitySoftFork() && !TestNet()) {
         return 1200 * CENT;
     }
 
     // 8.3% chance of original APR
-    if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
+    if (pindex->nHeight % 1200 && nCurrentSupply <= 10000000) {
         return 1200 * CENT;
     }
 
     // 12.1% chance of original APR
-    if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
+    if (pindex->nHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) {
         return 1200 * CENT;
     }
 
     // 15.3% chance of original APR
-    if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
+    if (pindex->nHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000) {
         return 1200 * CENT;
     }
 
@@ -1347,33 +1344,37 @@ inline int64_t GetCoinYearReward() {
     return 1200 - (1200 * (nCurrentSupply/MAX_MONEY)) * CENT;
 }
 
-inline int GetMinStakeAge()
+// returns the minimum stake age based on 8 hours of time
+inline int GetMinStakeAge(CBlockIndex* pindex)
 {
     int nHours = 8;
-    int nCurrentSupply = pindexBest->nMoneySupply;
+    int nCurrentSupply = pindex->nMoneySupply;
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nBestHeight < Params().StabilitySoftFork() && !TestNet()) {
+    if (pindex->nHeight < Params().StabilitySoftFork() && !TestNet()) {
         return nHours * 60 * 60;
     }
 
-    // 8.3% chance of original maturation
-    if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
-        return nHours * 60 * 60;
+    if (TestNet()) {
+        return 3600;
     }
 
-    // 12.1% chance of original maturation
-    if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
-        return nHours * 60 * 60;
+    // 8.3% chance of instant maturation
+    if (pindex->nHeight % 1200 && nCurrentSupply <= 10000000) {
+        return 0;
     }
 
-    // 15.3% chance of original maturation
-    if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
-        return nHours * 60 * 60;
+    // 12.1% chance of instant maturation
+    if (pindex->nHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) {
+        return 0;
+    }
+
+    // 15.3% chance of instant maturation
+    if (pindex->nHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000) {
+        return 0;
     }
 
     int nMultiplier = nCurrentSupply / 1000000;
-
     return (nHours * nMultiplier) * 60 * 60;
 }
 
