@@ -1308,20 +1308,19 @@ protected:
 };
 
 
-
 //
 // mechanisms for coin reward and maturation modification
 //
 
-
-static const int SOFT_FORK_ACTIVATION = 875000;
+int nStabilityForkBlock = 875000;
+int StabilitySoftFork() const { return nStabilityForkBlock }
 
 // returns percentage reward per year
 inline int64_t GetCoinYearReward() {
     int nCurrentSupply = pindexBest->nMoneySupply;
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nBestHeight <= SOFT_FORK_ACTIVATION && !TestNet()) {
+    if (nBestHeight < Params().StabilitySoftFork() && !TestNet()) {
         return 1200 * CENT;
     }
 
@@ -1354,7 +1353,7 @@ inline int GetMinStakeAge()
     int nCurrentSupply = pindexBest->nMoneySupply;
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nBestHeight <= SOFT_FORK_ACTIVATION && !TestNet()) {
+    if (nBestHeight < Params().StabilitySoftFork() && !TestNet()) {
         return nHours * 60 * 60;
     }
 
