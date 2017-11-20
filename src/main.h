@@ -53,64 +53,6 @@ inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MO
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 
-
-static const int SOFT_FORK_ACTIVATION = 900000; // TO BE DETERMINED
-
-// returns percentage reward per year
-inline int64_t GetCoinYearReward(int nDescalation) {
-    int nCurrentSupply = pindexBest->nMoneySupply;
-
-    // if not yet reaching activation block
-    if (nBestHeight < SOFT_FORK_ACTIVATION) {
-        return 1200 * CENT;
-    }
-
-    if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
-        return 1200 * CENT;
-    }
-
-    if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
-        return 1200 * CENT;
-    }
-
-    if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
-        return 1200 * CENT;
-    }
-
-    if (nCurrentSupply > 20000000) {
-        return 0 * CENT;
-    }
-
-    return 1200 - (1200 * (nCurrentSupply/MAX_MONEY)) * CENT;
-}
-
-inline int GetMinStakeAge()
-{
-    int nHours = 8;
-
-    // if not yet reaching activation block
-    if (nBestHeight < SOFT_FORK_ACTIVATION) {
-        return nHours * 60 * 60;
-    }
-
-    if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
-        return nHours * 60 * 60;
-    }
-
-    if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
-        return nHours * 60 * 60;
-    }
-
-    if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
-        return nHours * 60 * 60;
-    }
-
-    int nCurrentSupply = pindexBest->nMoneySupply;
-    int nMultiplier = nCurrentSupply / 1000000
-
-    return (nHours * nMultiplier) * 60 * 60
-}
-
 inline bool IsProtocolV1RetargetingFixed(int nHeight) { return TestNet() || nHeight > 0; }
 inline bool IsProtocolV2(int nHeight) { return TestNet() || nHeight > 0; }
 
@@ -205,12 +147,6 @@ void ThreadStakeMiner(CWallet *pwallet);
 /** (try to) add transaction to memory pool **/
 bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
                         bool* pfMissingInputs);
-
-
-
-
-
-
 
 /** Position on disk for a particular transaction. */
 class CDiskTxPos
@@ -1371,5 +1307,69 @@ protected:
     friend void ::UnregisterWallet(CWalletInterface*);
     friend void ::UnregisterAllWallets();
 };
+
+
+
+//
+// mechanisms for coin reward and maturation modification
+//
+
+
+static const int SOFT_FORK_ACTIVATION = 875000;
+
+// returns percentage reward per year
+inline int64_t GetCoinYearReward() {
+    int nCurrentSupply = pindexBest->nMoneySupply;
+
+    // if not yet reaching activation block
+    if (nBestHeight < SOFT_FORK_ACTIVATION) {
+        return 1200 * CENT;
+    }
+
+    if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
+        return 1200 * CENT;
+    }
+
+    if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
+        return 1200 * CENT;
+    }
+
+    if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
+        return 1200 * CENT;
+    }
+
+    if (nCurrentSupply > 20000000) {
+        return 0 * CENT;
+    }
+
+    return 1200 - (1200 * (nCurrentSupply/MAX_MONEY)) * CENT;
+}
+
+inline int GetMinStakeAge()
+{
+    int nHours = 8;
+    int nCurrentSupply = pindexBest->nMoneySupply;
+
+    // if not yet reaching activation block
+    if (nBestHeight < SOFT_FORK_ACTIVATION) {
+        return nHours * 60 * 60;
+    }
+
+    if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
+        return nHours * 60 * 60;
+    }
+
+    if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
+        return nHours * 60 * 60;
+    }
+
+    if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
+        return nHours * 60 * 60;
+    }
+
+    int nMultiplier = nCurrentSupply / 1000000;
+
+    return (nHours * nMultiplier) * 60 * 60;
+}
 
 #endif

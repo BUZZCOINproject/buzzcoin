@@ -630,7 +630,6 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
     if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin && mode==GMF_SEND) )  
     {
         int64_t nNewMinFee = 0;
-        int64_t prevNvalue = 0;
     
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
         {
