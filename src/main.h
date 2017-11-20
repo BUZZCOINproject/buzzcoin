@@ -1320,8 +1320,8 @@ static const int SOFT_FORK_ACTIVATION = 875000;
 inline int64_t GetCoinYearReward() {
     int nCurrentSupply = pindexBest->nMoneySupply;
 
-    // if not yet reaching activation block
-    if (nBestHeight < SOFT_FORK_ACTIVATION) {
+    // if not yet reaching activation block and we are NOT on test net
+    if (nBestHeight <= SOFT_FORK_ACTIVATION && !TestNet()) {
         return 1200 * CENT;
     }
 
@@ -1353,8 +1353,8 @@ inline int GetMinStakeAge()
     int nHours = 8;
     int nCurrentSupply = pindexBest->nMoneySupply;
 
-    // if not yet reaching activation block
-    if (nBestHeight < SOFT_FORK_ACTIVATION) {
+    // if not yet reaching activation block and we are NOT on test net
+    if (nBestHeight <= SOFT_FORK_ACTIVATION && !TestNet()) {
         return nHours * 60 * 60;
     }
 
