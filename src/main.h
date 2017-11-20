@@ -68,7 +68,6 @@ extern CTxMemPool mempool;
 extern std::map<uint256, CBlockIndex*> mapBlockIndex;
 extern std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 extern CBlockIndex* pindexGenesisBlock;
-extern unsigned int nStakeMinAge;
 extern unsigned int nNodeLifespan;
 extern int nCoinbaseMaturity;
 extern int nBestHeight;
@@ -1326,18 +1325,22 @@ inline int64_t GetCoinYearReward() {
         return 1200 * CENT;
     }
 
+    // 8.3% chance of original APR
     if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
         return 1200 * CENT;
     }
 
+    // 12.1% chance of original APR
     if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
         return 1200 * CENT;
     }
 
+    // 15.3% chance of original APR
     if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
         return 1200 * CENT;
     }
 
+    // no reward after 20b
     if (nCurrentSupply > 20000000) {
         return 0 * CENT;
     }
@@ -1355,14 +1358,17 @@ inline int GetMinStakeAge()
         return nHours * 60 * 60;
     }
 
+    // 8.3% chance of original maturation
     if (nBestHeight % 1200 && nCurrentSupply < 10000000) {
         return nHours * 60 * 60;
     }
 
+    // 12.1% chance of original maturation
     if (nBestHeight % 820 && nCurrentSupply > 10000000 && nCurrentSupply < 15000000) {
         return nHours * 60 * 60;
     }
 
+    // 15.3% chance of original maturation
     if (nBestHeight % 650 && nCurrentSupply > 15000000 && nCurrentSupply < 20000000) {
         return nHours * 60 * 60;
     }
