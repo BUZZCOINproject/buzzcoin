@@ -1317,36 +1317,34 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     int nCurrentSupply = pindex->nMoneySupply;
     int nCurrentHeight = pindex->nHeight;
 
-    printf("GetCoinYearReward variables...");
-    printf("- currentSupply -> %d", nCurrentSupply);
-    printf("- curentHeight -> %d", nCurrentHeight);
-    printf("- stablityForkActivation -> %d", Params().StabilitySoftFork());
+    printf("GetCoinYearReward variables...\n");
+    printf("- currentSupply -> %d\n", nCurrentSupply);
+    printf("- curentHeight -> %d\n", nCurrentHeight);
+    printf("- stablityForkActivation -> %d\n", Params().StabilitySoftFork());
 
     // if not yet reaching activation block and we are NOT on test net
     if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
+        printf("pre-fork APR activated\n\n");
         return 1200 * CENT;
     }
 
-    // 8.3% chance of original APR
-    if (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) {
-        return 1200 * CENT;
-    }
-
-    // 12.1% chance of original APR
-    if (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) {
-        return 1200 * CENT;
-    }
-
-    // 15.3% chance of original APR
-    if (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000) {
+    // 8.3%, 12,1%, 15.3% chance of original APR
+    if (
+        (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) ||
+        (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) ||
+        (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000)
+    ) {
+        printf("original APR activated\n\n");
         return 1200 * CENT;
     }
 
     // no reward after 20b
     if (nCurrentSupply > 20000000) {
+        printf("NO MORE APR activated\n\n");
         return 0 * CENT;
     }
 
+    printf("new APR activated\n\n");
     return 1200 - (1200 * (nCurrentSupply/MAX_MONEY)) * CENT;
 }
 
@@ -1357,35 +1355,34 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     int nCurrentSupply = pindex->nMoneySupply;
     int nCurrentHeight = pindex->nHeight;
 
-    printf("GetCoinYearReward variables...");
-    printf("- currentSupply -> %d", nCurrentSupply);
-    printf("- curentHeight -> %d", nCurrentHeight);
-    printf("- stablityForkActivation -> %d", Params().StabilitySoftFork());
-    printf("- nHours -> %d", nHours);
+    printf("GetMinStakeAge variables...\n");
+    printf("- currentSupply -> %d\n", nCurrentSupply);
+    printf("- curentHeight -> %d\n", nCurrentHeight);
+    printf("- stablityForkActivation -> %d\n", Params().StabilitySoftFork());
+    printf("- nHours -> %d\n", nHours);
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
+    if (nCurrentHeight < Params().StabilitySoftFork()) {
+        printf("pre-fork maturation activated\n\n");
         return nHours * 60 * 60;
     }
 
     if (TestNet()) {
+        printf("testnet maturation activated\n\n");
         return 3600;
     }
 
-    // 8.3% chance of instant maturation
-    if (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) {
+    // 8.3%, 12.1%, 15.3% chance of instant maturation
+    if (
+        (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) ||
+        (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) ||
+        (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000)
+    ) {
+        printf("instant maturation activated\n\n");
         return 0;
     }
 
-    // 12.1% chance of instant maturation
-    if (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) {
-        return 0;
-    }
-
-    // 15.3% chance of instant maturation
-    if (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000) {
-        return 0;
-    }
+    printf("new maturation activated\n\n");
 
     int nMultiplier = nCurrentSupply / 1000000;
     return (nHours * nMultiplier) * 60 * 60;
