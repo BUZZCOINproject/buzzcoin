@@ -1315,24 +1315,30 @@ protected:
 // returns percentage reward per year
 inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     int nCurrentSupply = pindex->nMoneySupply;
+    int nCurrentHeight = pindex->nHeight;
+
+    printf("GetCoinYearReward variables...");
+    printf("- currentSupply -> %d", nCurrentSupply);
+    printf("- curentHeight -> %d", nCurrentHeight);
+    printf("- stablityForkActivation -> %d", Params().StabilitySoftFork());
 
     // if not yet reaching activation block and we are NOT on test net
-    if (pindex->nHeight < Params().StabilitySoftFork() && !TestNet()) {
+    if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
         return 1200 * CENT;
     }
 
     // 8.3% chance of original APR
-    if (pindex->nHeight % 1200 && nCurrentSupply <= 10000000) {
+    if (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) {
         return 1200 * CENT;
     }
 
     // 12.1% chance of original APR
-    if (pindex->nHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) {
+    if (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) {
         return 1200 * CENT;
     }
 
     // 15.3% chance of original APR
-    if (pindex->nHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000) {
+    if (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000) {
         return 1200 * CENT;
     }
 
@@ -1349,9 +1355,16 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 {
     int nHours = 8;
     int nCurrentSupply = pindex->nMoneySupply;
+    int nCurrentHeight = pindex->nHeight;
+
+    printf("GetCoinYearReward variables...");
+    printf("- currentSupply -> %d", nCurrentSupply);
+    printf("- curentHeight -> %d", nCurrentHeight);
+    printf("- stablityForkActivation -> %d", Params().StabilitySoftFork());
+    printf("- nHours -> %d", nHours);
 
     // if not yet reaching activation block and we are NOT on test net
-    if (pindex->nHeight < Params().StabilitySoftFork() && !TestNet()) {
+    if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
         return nHours * 60 * 60;
     }
 
@@ -1360,17 +1373,17 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     }
 
     // 8.3% chance of instant maturation
-    if (pindex->nHeight % 1200 && nCurrentSupply <= 10000000) {
+    if (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) {
         return 0;
     }
 
     // 12.1% chance of instant maturation
-    if (pindex->nHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) {
+    if (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) {
         return 0;
     }
 
     // 15.3% chance of instant maturation
-    if (pindex->nHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000) {
+    if (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000) {
         return 0;
     }
 
