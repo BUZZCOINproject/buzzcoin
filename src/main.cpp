@@ -1053,8 +1053,13 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 // stakers's coin stake reward
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pindex)
 {
+    int64_t nSubsidy;
 
-    int64_t nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + GetMinStakeAge(pindex));
+    if (pindex->nHeight >= Params().StabilitySoftFork()) {
+        nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + GetMinStakeAge(pindex));
+    } else {
+        nSubsidy = nCoinAge * (1200 * CENT) * 33 / (365 * 33 + 8);
+    }
 
     LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d\n", FormatMoney(nSubsidy), nCoinAge);
 
