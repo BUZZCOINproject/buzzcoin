@@ -1331,7 +1331,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     // 8.3%, 12,1%, 15.3% chance of original APR
     if (
         (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) ||
-        (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) ||
+        (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) ||
         (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000)
     ) {
         printf("original APR activated\n\n");
