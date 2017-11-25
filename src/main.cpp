@@ -1056,7 +1056,7 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pind
     int64_t nSubsidy;
 
     if (pindex->nHeight >= Params().StabilitySoftFork()) {
-        nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + GetMinStakeAge(pindex));
+        nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + 8);
     } else {
         nSubsidy = nCoinAge * (1200 * CENT) * 33 / (365 * 33 + 8);
     }
@@ -1595,7 +1595,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 
         int64_t nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nFees, pindex);
 
-        if (nStakeReward > nCalculatedStakeReward)
+        if (nStakeReward > nCalculatedStakeReward) 
             return DoS(100, error("ConnectBlock() : coinstake pays too much(actual=%d vs calculated=%d)", nStakeReward, nCalculatedStakeReward));
     }
 
