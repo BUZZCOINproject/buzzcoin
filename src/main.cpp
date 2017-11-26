@@ -616,7 +616,9 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
         if(t>ForkTiming)
 	{
 		TransactionFeeDivider = TransactionFeeDivider_V2;
-	} else {TransactionFeeDivider = TransactionFeeDivider_V1;}
+	} else {
+        TransactionFeeDivider = TransactionFeeDivider_V1;
+    }
 	
     // Base fee is either nMinTxFee or nMinRelayTxFee
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
@@ -633,7 +635,10 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
     
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
         {
-            bool found=true; //do not add fees when sending to the same address (this can be used for restructuring large single inputs)
+            // do not add fees when sending to the same address
+            // - this can be used for restructuring large single inputs
+            bool found=true; 
+
             BOOST_FOREACH(const CTxIn& txin, tx.vin)
             {
                 if(txin.prevout.hash == txout.GetHash())
@@ -647,9 +652,13 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
             }
             if(!found)
             {
-                // TODO IMPROve
-                if (t > Fork3){nNewMinFee = (txout.nValue / 100000) * 1;} 
-                else {nNewMinFee = (txout.nValue / 100) * 25;}
+                // TODO: IMPROVE
+                if (t > Fork3){
+                    nNewMinFee = (txout.nValue / 100000) * 1;
+                } 
+                else {
+                    nNewMinFee = (txout.nValue / 100) * 25;
+                }
                 
 
             }
@@ -658,19 +667,21 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
 }
         nMinFee += nNewMinFee;
     }
+
     if(nMinFee > COIN*1000000000) // max 1 billion coins fee.
     {
         nMinFee=COIN*1000000000;
     }
 	
-    if (!MoneyRange(nMinFee))
+    if (!MoneyRange(nMinFee)) {
         nMinFee = MAX_MONEY;
+    }
+
     return nMinFee;
 }
 
 
-bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
-                        bool* pfMissingInputs)
+bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree, bool* pfMissingInputs)
 {
     AssertLockHeld(cs_main);
     if (pfMissingInputs)
