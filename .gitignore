@@ -3,6 +3,7 @@ build
 Makefile
 Makefile.*
 BuzzCoin-Qt.app
+buzzcoin-qt
 .qmake.stash
 Makefile
 qrc_*.cpp
