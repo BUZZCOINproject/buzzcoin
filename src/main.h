@@ -1312,13 +1312,18 @@ protected:
 // mechanisms for coin reward and maturation modification
 //
 
+double GetCoinSupplyFromAmount(int64_t amount)
+{
+    return (double)amount / (double)COIN;
+}
+
 // returns percentage reward per year
 inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
-    int nCurrentSupply = (double)pindex->nMoneySupply / (double)COIN;
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply)
     int nCurrentHeight = pindex->nHeight;
 
     LogPrintf("GetCoinYearReward variables...\n");
-    LogPrintf("- currentSupply -> %d\n", nCurrentSupply);
+    LogPrintf("- currentSupply -> %d\n", fCurrentSupply);
     LogPrintf("- curentHeight -> %d\n", nCurrentHeight);
     LogPrintf("- stablityForkActivation -> %d\n", Params().StabilitySoftFork());
 
@@ -1330,33 +1335,33 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
 
     // 8.3%, 12,1%, 15.3% chance of original APR
     if (
-        (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) ||
-        (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) ||
-        (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000)
+        (nCurrentHeight % 1200 && fCurrentSupply <= 10000000) ||
+        (nCurrentHeight % 820 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
+        (nCurrentHeight % 650 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
     ) {
         LogPrintf("original APR activated\n\n");
         return 1200 * CENT;
     }
 
     // no reward after 20b
-    if (nCurrentSupply > 20000000) {
+    if (fCurrentSupply > 20000000) {
         LogPrintf("NO MORE APR activated\n\n");
         return 0 * CENT;
     }
 
     LogPrintf("new APR activated\n\n");
-    return 1200 - (1200 * (nCurrentSupply/MAX_MONEY)) * CENT;
+    return 1200 - (1200 * (fCurrentSupply/MAX_MONEY)) * CENT;
 }
 
 // returns the minimum stake age based on 8 hours of time
 inline int GetMinStakeAge(CBlockIndex* pindex)
 {
     int nHours = 8;
-    int nCurrentSupply = (double)pindex->nMoneySupply / (double)COIN;
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply)
     int nCurrentHeight = pindex->nHeight;
 
     LogPrintf("GetMinStakeAge variables...\n");
-    LogPrintf("- currentSupply -> %d\n", nCurrentSupply);
+    LogPrintf("- currentSupply -> %d\n", fCurrentSupply);
     LogPrintf("- curentHeight -> %d\n", nCurrentHeight);
     LogPrintf("- stablityForkActivation -> %d\n", Params().StabilitySoftFork());
     LogPrintf("- nHours -> %d\n", nHours);
@@ -1374,9 +1379,9 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 
     // 8.3%, 12.1%, 15.3% chance of instant maturation
     if (
-        (nCurrentHeight % 1200 && nCurrentSupply <= 10000000) ||
-        (nCurrentHeight % 820 && nCurrentSupply >= 10000000 && nCurrentSupply <= 15000000) ||
-        (nCurrentHeight % 650 && nCurrentSupply >= 15000000 && nCurrentSupply <= 20000000)
+        (nCurrentHeight % 1200 && fCurrentSupply <= 10000000) ||
+        (nCurrentHeight % 820 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
+        (nCurrentHeight % 650 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
     ) {
         LogPrintf("instant maturation activated\n\n");
         return 0;
@@ -1384,7 +1389,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 
     LogPrintf("new maturation activated\n\n");
 
-    int nMultiplier = nCurrentSupply / 1000000;
+    int nMultiplier = fCurrentSupply / 1000000;
     return (nHours * nMultiplier) * 60 * 60;
 }
 
