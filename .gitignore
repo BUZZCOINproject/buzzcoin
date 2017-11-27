@@ -10,6 +10,8 @@ qrc_*.cpp
 *.qm
 *.pro.user
 *.dmg
+object_script.buzzcoin-qt.*
+buzzcoin-qt_plugin_import.cpp
 
 # Windows image file caches
 Thumbs.db
