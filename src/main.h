@@ -1319,7 +1319,7 @@ double GetCoinSupplyFromAmount(int64_t amount)
 
 // returns percentage reward per year
 inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
-    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply)
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
 
     LogPrintf("GetCoinYearReward variables...\n");
@@ -1357,7 +1357,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
 inline int GetMinStakeAge(CBlockIndex* pindex)
 {
     int nHours = 8;
-    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply)
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
 
     LogPrintf("GetMinStakeAge variables...\n");
