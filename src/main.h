@@ -1312,7 +1312,7 @@ protected:
 // mechanisms for coin reward and maturation modification
 //
 
-double GetCoinSupplyFromAmount(int64_t amount)
+inline double GetCoinSupplyFromAmount(int64_t amount)
 {
     return (double)amount / (double)COIN;
 }
