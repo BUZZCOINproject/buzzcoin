@@ -1050,13 +1050,23 @@ time_t t=time(NULL);
 int64_t GetProofOfWorkReward(int64_t nFees)
 {
     int64_t nSubsidy = 10 * COIN;
-	if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
+
+    if (TestNet()) {
+        // We mine 1 billion every 500 blocks to test new APR
+        if(pindexBest->nHeight == 1) { nSubsidy = 1000000000 * COIN; }
+        if(pindexBest->nHeight == 500) { nSubsidy = 1000000000 * COIN; }
+        if(pindexBest->nHeight == 1000) { nSubsidy = 1000000000 * COIN; }
+        if(pindexBest->nHeight == 1500) { nSubsidy = 1000000000 * COIN; }
+        if(pindexBest->nHeight == 2000) { nSubsidy = 1000000000 * COIN; }
+        if(pindexBest->nHeight == 2500) { nSubsidy = 1000000000 * COIN; }
+    } else {
+        if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
+    }
+
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
 
     if (t > 1505852400)
-    {
         return nSubsidy;
-    } 
     else
         return nSubsidy + (nFees / 2);
 }
@@ -1066,11 +1076,11 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pind
 {
     int64_t nSubsidy;
 
-    if (TestNet() || pindex->nHeight >= Params().StabilitySoftFork()) {
+    // if (TestNet() || pindex->nHeight >= Params().StabilitySoftFork()) {
         nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + 8);
-    } else {
-        nSubsidy = nCoinAge * (1200 * CENT) * 33 / (365 * 33 + 8);
-    }
+    // } else {
+        // nSubsidy = nCoinAge * (1200 * CENT) * 33 / (365 * 33 + 8);
+    // }
 
     LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d\n", FormatMoney(nSubsidy), nCoinAge);
 

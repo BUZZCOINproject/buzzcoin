@@ -1322,34 +1322,32 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
 
-    LogPrintf("GetCoinYearReward variables...\n");
-    LogPrintf("- currentSupply -> %d\n", fCurrentSupply);
-    LogPrintf("- curentHeight -> %d\n", nCurrentHeight);
-    LogPrintf("- stablityForkActivation -> %d\n", Params().StabilitySoftFork());
+    LogPrintf("GetCoinYearReward(): currentSupply=%d curentHeight=%d\n", fCurrentSupply, nCurrentHeight);
 
     // if not yet reaching activation block and we are NOT on test net
     if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
-        LogPrintf("pre-fork APR activated\n\n");
+        LogPrintf("GetCoinYearReward(): yearReward=1200\n");
         return 1200 * CENT;
     }
 
-    // 8.3%, 12,1%, 15.3% chance of original APR
+    // Power Blocks:
+    // The original APR is 8.3%, 12,1%, 15.3% chance of original APR
     if (
-        (nCurrentHeight % 1200 && fCurrentSupply <= 10000000) ||
-        (nCurrentHeight % 820 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
-        (nCurrentHeight % 650 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
+        (nCurrentHeight % 1200 && fCurrentSupply <= 10000000000) ||
+        (nCurrentHeight % 820 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
+        (nCurrentHeight % 650 && fCurrentSupply >= 15000000000 && fCurrentSupply <= 20000000000)
     ) {
-        LogPrintf("original APR activated\n\n");
+        LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n");
         return 1200 * CENT;
     }
 
     // no reward after 20b
     if (fCurrentSupply > 20000000) {
-        LogPrintf("NO MORE APR activated\n\n");
+        LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
         return 0 * CENT;
     }
 
-    LogPrintf("new APR activated\n\n");
+    LogPrintf("GetCoinYearReward(): yearReward=%d\n", 1200 - (1200 * (fCurrentSupply/MAX_MONEY)));
     return 1200 - (1200 * (fCurrentSupply/MAX_MONEY)) * CENT;
 }
 
@@ -1360,21 +1358,12 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
 
-    LogPrintf("GetMinStakeAge variables...\n");
-    LogPrintf("- currentSupply -> %d\n", fCurrentSupply);
-    LogPrintf("- curentHeight -> %d\n", nCurrentHeight);
-    LogPrintf("- stablityForkActivation -> %d\n", Params().StabilitySoftFork());
-    LogPrintf("- nHours -> %d\n", nHours);
+    LogPrintf("GetMinStakeAge(): fCurrentSupply=%d nCurrentHeight=%d nHours=%d\n", fCurrentSupply, nCurrentHeight, nHours);
 
     // if not yet reaching activation block and we are NOT on test net
     if (nCurrentHeight < Params().StabilitySoftFork()) {
-        LogPrintf("pre-fork maturation activated\n\n");
+        LogPrintf("GetMinStakeAge(): minStakeAge=%d\n", nHours * 60 * 60);
         return nHours * 60 * 60;
-    }
-
-    if (TestNet()) {
-        LogPrintf("testnet maturation activated\n\n");
-        return 3600;
     }
 
     // 8.3%, 12.1%, 15.3% chance of instant maturation
@@ -1383,13 +1372,18 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
         (nCurrentHeight % 820 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
         (nCurrentHeight % 650 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
     ) {
-        LogPrintf("instant maturation activated\n\n");
+        LogPrintf("GetMinStakeAge(): PowerBlock minStakeAge=0\n");
         return 0;
     }
 
-    LogPrintf("new maturation activated\n\n");
+    if (TestNet()) {
+        nHours = 1;
+    }
 
     int nMultiplier = fCurrentSupply / 1000000;
+
+    LogPrintf("GetMinStakeAge(): minStakeAge=%d\n", (nHours * nMultiplier) * 60 * 60);
+
     return (nHours * nMultiplier) * 60 * 60;
 }
 
