@@ -25,8 +25,11 @@ int64_t nTransactionFee = MIN_TX_FEE;
 int64_t nReserveBalance = 0;
 int64_t nMinimumInputValue = 0;
 
-static unsigned int GetStakeSplitAge() { return 9 * 24 * 60 * 60; }
-static int64_t GetStakeCombineThreshold() { return 10000 * COIN; }
+unsigned int nStakeSplitAge = 1 * 24 * 60 * 60;
+int64_t nStakeCombineThreshold = 1000 * COIN;
+
+//static unsigned int GetStakeSplitAge() { return 9 * 24 * 60 * 60; }
+//static int64_t GetStakeCombineThreshold() { return 10000 * COIN; }
 
 int64_t gcd(int64_t n,int64_t m) { return m == 0 ? n : gcd(m, n % m); }
 static uint64_t CoinWeightCost(const COutput &out)
@@ -1901,11 +1904,26 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 vwtxPrev.push_back(pcoin.first);
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
+                uint64_t nCoinAge;
+                CTxDB txdb("r");
+                if (txNew.GetCoinAge(txdb, nCoinAge))
+                {
+                    uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetProofOfStakeReward(nCoinAge, nFees);
+                    if (nTotalSize / 2 > nStakeSplitThreshold * COIN)
+                        txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
+                }
+
+                if (fDebug && GetBoolArg("-printcoinstake",!fDebug))
+                    printf("CreateCoinStake : added kernel type=%d\n", whichType);
+                fKernelFound = true;
+                break;
+
+                /* Old code.
                 if (GetWeight(nBlockTime, (int64_t)txNew.nTime) < GetStakeSplitAge())
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
                 LogPrint("coinstake", "CreateCoinStake : added kernel type=%d\n", whichType);
                 fKernelFound = true;
-                break;
+                break;*/
             }
         }
 
@@ -1929,13 +1947,15 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             if (txNew.vin.size() >= 100)
                 break;
             // Stop adding more inputs if value is already pretty significant
-            if (nCredit >= GetStakeCombineThreshold())
+            //if (nCredit >= GetStakeCombineThreshold())
+            if (nCredit >= nStakeCombineThreshold)
                 break;
             // Stop adding inputs if reached reserve limit
             if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance)
                 break;
             // Do not add additional significant input
-            if (pcoin.first->vout[pcoin.second].nValue >= GetStakeCombineThreshold())
+            //if (pcoin.first->vout[pcoin.second].nValue >= GetStakeCombineThreshold())
+            if (pcoin.first->vout[pcoin.second].nValue >= nStakeCombineThreshold)
                 continue;
             // Do not add input that is still too young
             if (nTimeWeight < nStakeMinAge)
