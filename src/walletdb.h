@@ -106,6 +106,8 @@ public:
 
     bool ReadAccount(const std::string& strAccount, CAccount& account);
     bool WriteAccount(const std::string& strAccount, const CAccount& account);
+
+    bool WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold);
 private:
     bool WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccountingEntry& acentry);
 public:
