@@ -101,7 +101,8 @@ public:
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
         nLastPOWBlock = 0x7fffffff;
-        nStabilityForkBlock = 875000;
+        nPreStabilityRewardEnsuranceBlock = 875000;
+        nStabilityForkBlock = 900000;
     }
 
     virtual const CBlock& GenesisBlock() const { return genesis; }
