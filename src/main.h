@@ -1333,9 +1333,9 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     // Power Blocks:
     // The original APR is 8.3%, 12,1%, 15.3% chance of original APR
     if (
-        (nCurrentHeight % 1200 && fCurrentSupply <= 10000000000) ||
-        (nCurrentHeight % 820 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
-        (nCurrentHeight % 650 && fCurrentSupply >= 15000000000 && fCurrentSupply <= 20000000000)
+        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
+        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= 20000000000)
     ) {
         LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
         return 1200 * CENT;
@@ -1360,15 +1360,15 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 
     // if not yet reaching activation block and we are NOT on test net
     if (nCurrentHeight < Params().StabilitySoftFork()) {
-        LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nHours * 60 * 60);
+        LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nCurrentHeight, nHours * 60 * 60);
         return nHours * 60 * 60;
     }
 
     // 8.3%, 12.1%, 15.3% chance of instant maturation
     if (
-        (nCurrentHeight % 1200 && fCurrentSupply <= 10000000) ||
-        (nCurrentHeight % 820 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
-        (nCurrentHeight % 650 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
+        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000) ||
+        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
     ) {
         LogPrintf("GetMinStakeAge(): PowerBlock fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
         return 0;
