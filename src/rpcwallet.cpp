@@ -1565,24 +1565,37 @@ Value makekeypair(const Array& params, bool fHelp)
     return result;
 }
 
+Value settxfee(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 1 || AmountFromValue(params[0]) < MIN_TX_FEE)
+        throw runtime_error(
+            "settxfee <amount>\n"
+            "<amount> is a real and is rounded to the nearest 0.01");
+
+    nTransactionFee = AmountFromValue(params[0]);
+    nTransactionFee = (nTransactionFee / CENT) * CENT;  // round to cent
+
+    return true;
+}
+
 Value setstakesplitthreshold(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "setstakesplitthreshold <1 - 25,000,000>\n"
             "This will set the output size of your stakes to never be below this number\n");
-    
+
     uint64_t nStakeSplitThreshold = boost::lexical_cast<int>(params[0].get_str());
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Unlock wallet to use this feature");
     if (nStakeSplitThreshold > 25000000)
-        return "out of range - setting split threshold failed";
-    
+        return "out of range - setting split threshold failed\n Range 1 - 25,000,000";
+
     CWalletDB walletdb(pwalletMain->strWalletFile);
     LOCK(pwalletMain->cs_wallet);
     {
         bool fFileBacked = pwalletMain->fFileBacked;
-        
+
         Object result;
         pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
         result.push_back(Pair("split stake threshold set to ", int(pwalletMain->nStakeSplitThreshold)));
@@ -1593,7 +1606,7 @@ Value setstakesplitthreshold(const Array& params, bool fHelp)
         }
         else
             result.push_back(Pair("saved to wallet.dat ", "false"));
-        
+
         return result;
     }
 }
@@ -1611,16 +1624,3 @@ Value getstakesplitthreshold(const Array& params, bool fHelp)
 
 }
 
-
-Value settxfee(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() < 1 || params.size() > 1 || AmountFromValue(params[0]) < MIN_TX_FEE)
-        throw runtime_error(
-            "settxfee <amount>\n"
-            "<amount> is a real and is rounded to the nearest 0.01");
-
-    nTransactionFee = AmountFromValue(params[0]);
-    nTransactionFee = (nTransactionFee / CENT) * CENT;  // round to cent
-
-    return true;
-}

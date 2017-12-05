@@ -25,11 +25,8 @@ int64_t nTransactionFee = MIN_TX_FEE;
 int64_t nReserveBalance = 0;
 int64_t nMinimumInputValue = 0;
 
-unsigned int nStakeSplitAge = 1 * 24 * 60 * 60;
-int64_t nStakeCombineThreshold = 1000 * COIN;
-
-//static unsigned int GetStakeSplitAge() { return 9 * 24 * 60 * 60; }
-//static int64_t GetStakeCombineThreshold() { return 10000 * COIN; }
+static unsigned int GetStakeSplitAge() { return 9 * 24 * 60 * 60; }
+static int64_t GetStakeCombineThreshold() { return 10000 * COIN; }
 
 int64_t gcd(int64_t n,int64_t m) { return m == 0 ? n : gcd(m, n % m); }
 static uint64_t CoinWeightCost(const COutput &out)
@@ -1918,7 +1915,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 fKernelFound = true;
                 break;
 
-                /* Old code.
+		/* Old code
                 if (GetWeight(nBlockTime, (int64_t)txNew.nTime) < GetStakeSplitAge())
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
                 LogPrint("coinstake", "CreateCoinStake : added kernel type=%d\n", whichType);
@@ -1947,15 +1944,13 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             if (txNew.vin.size() >= 100)
                 break;
             // Stop adding more inputs if value is already pretty significant
-            //if (nCredit >= GetStakeCombineThreshold())
-            if (nCredit >= nStakeCombineThreshold)
+            if (nCredit >= GetStakeCombineThreshold())
                 break;
             // Stop adding inputs if reached reserve limit
             if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance)
                 break;
             // Do not add additional significant input
-            //if (pcoin.first->vout[pcoin.second].nValue >= GetStakeCombineThreshold())
-            if (pcoin.first->vout[pcoin.second].nValue >= nStakeCombineThreshold)
+            if (pcoin.first->vout[pcoin.second].nValue >= GetStakeCombineThreshold())
                 continue;
             // Do not add input that is still too young
             if (nTimeWeight < nStakeMinAge)

@@ -151,6 +151,7 @@ bool CWalletDB::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
     nWalletDBUpdated++;
     return Write(std::string("stakeSplitThreshold"), nStakeSplitThreshold);
 }
+
 bool CWalletDB::ReadAccount(const string& strAccount, CAccount& account)
 {
     account.SetNull();
