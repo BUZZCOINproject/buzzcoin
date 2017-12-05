@@ -1322,7 +1322,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
 
-    LogPrintf("GetCoinYearReward(): currentSupply=%d curentHeight=%d\n", fCurrentSupply, nCurrentHeight);
+    LogPrintf("GetCoinYearReward(): currentSupply=%.8f currentHeight=%d\n", fCurrentSupply, nCurrentHeight);
 
     // if not yet reaching activation block and we are NOT on test net
     if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
@@ -1337,7 +1337,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
         (nCurrentHeight % 820 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
         (nCurrentHeight % 650 && fCurrentSupply >= 15000000000 && fCurrentSupply <= 20000000000)
     ) {
-        LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n");
+        LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
         return 1200 * CENT;
     }
 
@@ -1358,11 +1358,9 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
 
-    LogPrintf("GetMinStakeAge(): fCurrentSupply=%d nCurrentHeight=%d nHours=%d\n", fCurrentSupply, nCurrentHeight, nHours);
-
     // if not yet reaching activation block and we are NOT on test net
     if (nCurrentHeight < Params().StabilitySoftFork()) {
-        LogPrintf("GetMinStakeAge(): minStakeAge=%d\n", nHours * 60 * 60);
+        LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nHours * 60 * 60);
         return nHours * 60 * 60;
     }
 
@@ -1372,7 +1370,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
         (nCurrentHeight % 820 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
         (nCurrentHeight % 650 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
     ) {
-        LogPrintf("GetMinStakeAge(): PowerBlock minStakeAge=0\n");
+        LogPrintf("GetMinStakeAge(): PowerBlock fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
         return 0;
     }
 
@@ -1382,7 +1380,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 
     int nMultiplier = fCurrentSupply / 1000000;
 
-    LogPrintf("GetMinStakeAge(): minStakeAge=%d\n", (nHours * nMultiplier) * 60 * 60);
+    LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
 
     return (nHours * nMultiplier) * 60 * 60;
 }
