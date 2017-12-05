@@ -1359,7 +1359,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     int nCurrentHeight = pindex->nHeight;
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nCurrentHeight < Params().StabilitySoftFork()) {
+    if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
         LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nCurrentHeight, nHours * 60 * 60);
         return nHours * 60 * 60;
     }
