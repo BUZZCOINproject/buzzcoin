@@ -86,6 +86,7 @@ protected:
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     int nLastPOWBlock;
     int nStabilityForkBlock;
+    int nPreStabilityRewardEnsuranceBlock;
 };
 
 /**
