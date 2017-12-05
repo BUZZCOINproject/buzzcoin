@@ -1325,7 +1325,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     LogPrintf("GetCoinYearReward(): currentSupply=%d curentHeight=%d\n", fCurrentSupply, nCurrentHeight);
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
+    if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
         LogPrintf("GetCoinYearReward(): yearReward=1200\n");
         return 1200 * CENT;
     }
@@ -1342,7 +1342,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     }
 
     // no reward after 20b
-    if (fCurrentSupply > 20000000) {
+    if (fCurrentSupply >= 20000000) {
         LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
         return 0 * CENT;
     }
@@ -1361,7 +1361,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     LogPrintf("GetMinStakeAge(): fCurrentSupply=%d nCurrentHeight=%d nHours=%d\n", fCurrentSupply, nCurrentHeight, nHours);
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nCurrentHeight < Params().StabilitySoftFork()) {
+    if (nCurrentHeight <= Params().StabilitySoftFork()) {
         LogPrintf("GetMinStakeAge(): minStakeAge=%d\n", nHours * 60 * 60);
         return nHours * 60 * 60;
     }
@@ -1385,6 +1385,11 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     LogPrintf("GetMinStakeAge(): minStakeAge=%d\n", (nHours * nMultiplier) * 60 * 60);
 
     return (nHours * nMultiplier) * 60 * 60;
+}
+
+inline int64_t GetMaxStakeAge(CBlockIndex* pindex) {
+    int nMinStakeAge = GetMinStakeAge(pindex);
+    return nMinStakeAge * 2;
 }
 
 #endif

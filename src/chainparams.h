@@ -68,6 +68,7 @@ public:
     virtual const vector<CAddress>& FixedSeeds() const = 0;
     int RPCPort() const { return nRPCPort; }
     int LastPOWBlock() const { return nLastPOWBlock; }
+    int PreStabilityRewardEnsuranceBlock() const { return nPreStabilityRewardEnsuranceBlock; }
     int StabilitySoftFork() const { return nStabilityForkBlock; }
 protected:
     CChainParams() {};

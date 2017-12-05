@@ -17,7 +17,14 @@ int64_t GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd, CBlockIndex*
     // this change increases active coins participating the hash and helps
     // to secure the network when proof-of-stake difficulty is low
 
-    return nIntervalEnd - nIntervalBeginning - GetMinStakeAge(pindex);
+    
+    // support pre stability fork assumptions
+    if (nBestHeight <= Params().PreStabilityRewardEnsuranceBlock()) {
+        return nIntervalEnd - nIntervalBeginning - GetMinStakeAge(pindex);
+    }
+
+    // future with max stake age.
+    return min(nIntervalEnd - nIntervalBeginning - GetMinStakeAge(pindex), GetMaxStakeAge(pindex));
 }
 
 // Get the last stake modifier and its generation time from a given block
