@@ -1053,12 +1053,7 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 
     if (TestNet()) {
         // We mine 1 billion every 500 blocks to test new APR
-        if(pindexBest->nHeight == 1) { nSubsidy = 1000000000 * COIN; }
-        if(pindexBest->nHeight == 500) { nSubsidy = 1000000000 * COIN; }
-        if(pindexBest->nHeight == 1000) { nSubsidy = 1000000000 * COIN; }
-        if(pindexBest->nHeight == 1500) { nSubsidy = 1000000000 * COIN; }
-        if(pindexBest->nHeight == 2000) { nSubsidy = 1000000000 * COIN; }
-        if(pindexBest->nHeight == 2500) { nSubsidy = 1000000000 * COIN; }
+        if(pindexBest->nHeight == 1) { nSubsidy = 10000000 * COIN; }
     } else {
         if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
     }
