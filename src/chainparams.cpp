@@ -101,7 +101,7 @@ public:
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
         nLastPOWBlock = 0x7fffffff;
-        nPreStabilityRewardEnsuranceBlock = 875000;
+        nPreStabilityRewardEnsuranceBlock = 885000;
         nStabilityForkBlock = 900000;
     }
 
