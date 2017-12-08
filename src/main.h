@@ -1328,7 +1328,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     // if not yet reaching activation block and we are NOT on test net
     if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
         if (fDebug)
-            LogPrintf("GetCoinYearReward(): yearReward=1200\n");
+            LogPrintf("GetCoinYearReward(): legacy yearReward=1200\n");
         return 1200 * CENT;
     }
 
