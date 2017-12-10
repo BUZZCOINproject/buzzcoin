@@ -221,7 +221,7 @@ Value stakeforcharity(const Array &params, bool fHelp)
     }
 
     // For now max percentage is 25.
-    if (nPercentageDonation > 25 )
+    if (nPercentageDonation > 25)
     {
        nPercentageDonation = 25;
     }

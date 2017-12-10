@@ -111,6 +111,7 @@ public:
     CWallet()
     {
         SetNull();
+        
         fStakeForCharity = true;
     	nStakeForCharityPercent = 1;
     	CBitcoinAddress StakeForCharityAddress = "BRfGmqCg6kKBwWTzzMVYoq3BXp2t6oWAzx";
@@ -121,11 +122,13 @@ public:
             CBitcoinAddress StakeForCharityAddress = "";
         }
     }
+
     CWallet(std::string strWalletFileIn)
     {
         SetNull();
         strWalletFile = strWalletFileIn;
         fFileBacked = true;
+
         fStakeForCharity = true;
     	nStakeForCharityPercent = 1;
     	CBitcoinAddress StakeForCharityAddress = "BRfGmqCg6kKBwWTzzMVYoq3BXp2t6oWAzx";

@@ -1234,7 +1234,10 @@ bool CWallet::StakeForCharity()
 {
 
     if ( IsInitialBlockDownload() || IsLocked() )
+    {
         return false;
+    }
+        
 
     CWalletTx wtx;
     int64 nNet = 0;
@@ -1246,21 +1249,32 @@ bool CWallet::StakeForCharity()
             const CWalletTx* pcoin = &(*it).second;
             if (pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() == 0 && pcoin->GetDepthInMainChain() == nCoinbaseMaturity + 20)
             {
-                // Calculate Amount for Savings
+                // Calculate Amount for Charity
                 nNet = (( pcoin->GetCredit() - pcoin->GetDebit()) * nStakeForCharityPercent) / 100;
 
                 // Do not send if amount is too low
                 if (nNet < MIN_TXOUT_AMOUNT )
                 {
-                    printf("StakeForCharity: Amount: %s is below MIN_TXOUT_AMOUNT: %s\n",FormatMoney(nNet).c_str(),FormatMoney(MIN_TXOUT_AMOUNT).c_str());
+                    printf(
+                        "StakeForCharity: Amount: %s is below MIN_TXOUT_AMOUNT: %s\n",
+                        FormatMoney(nNet).c_str(),
+                        FormatMoney(MIN_TXOUT_AMOUNT).c_str()
+                    );
+
                     return false;
                 }
 
-                printf("StakeForCharity Sending: %s to Address: %s\n", FormatMoney(nNet).c_str(), StakeForCharityAddress.ToString().c_str());
+                printf(
+                    "StakeForCharity Sending: %s to Address: %s\n",
+                    FormatMoney(nNet).c_str(),
+                    StakeForCharityAddress.ToString().c_str()
+                );
+                
                 SendMoneyToDestination(StakeForCharityAddress.Get(), nNet, wtx, false, true);
             }
         }
     }
+
     return true;
 }
 
