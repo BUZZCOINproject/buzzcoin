@@ -230,7 +230,28 @@ Value stakeforcharity(const Array &params, bool fHelp)
     pwalletMain->nStakeForCharityPercent = nPercentageDonation;
     pwalletMain->fStakeForCharity = true;
 
-    return Value::null;
+    LOCK(pwalletMain->cs_wallet);
+    {
+        bool fFileBacked = pwalletMain->fFileBacked;
+
+        Object result;
+        pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
+        result.push_back(Pair("charity enabled set to ", int(pwalletMain->fStakeForCharity)));
+        result.push_back(Pair("charity amount set to ", int(pwalletMain->nStakeForCharityPercent)));
+        result.push_back(Pair("charity address set to ", int(pwalletMain->StakeForCharityAddress)));
+
+        if(fFileBacked)
+        {
+            walletdb.WriteStakeForCharityEnabled(fStakeForCharity);
+            walletdb.WriteStakeForCharityPercentage(nStakeForCharityPercent);
+            walletdb.WriteStakeForCharityAddress(StakeForCharityAddress);
+            result.push_back(Pair("saved to wallet.dat ", "true"));
+        } else {
+            result.push_back(Pair("saved to wallet.dat ", "false"));
+        }
+
+        return result;
+    }
 }
 
 Value setaccount(const Array& params, bool fHelp)
