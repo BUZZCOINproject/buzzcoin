@@ -195,59 +195,56 @@ Value stakeforcharity(const Array &params, bool fHelp)
         throw runtime_error(
             "stakeforcharity <BUZZ address> <percent>\n"
             "Gives a percentage of a found stake to a different address, after stake matures\n"
-            "Percent is a whole number 1 to 25."
+            "Percent is a whole number 1 to 25.\n"
             + HelpRequiringPassphrase());
 
     CBitcoinAddress address(params[0].get_str());
+
     if (!address.IsValid())
+    {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid BUZZ address");
+    }
 
     if (params[1].get_int() < 0)
+    {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
+    }
 
     if (pwalletMain->IsLocked())
+    {
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
+    }
 
     unsigned int nPercentageDonation = (unsigned int) params[1].get_int();
 
+    Object result;
+
     // Turn off if we set to zero.
-    // Future: After we allow multiple addresses, only turn of this address
     if (nPercentageDonation <= 0)
     {
         pwalletMain->fStakeForCharity = false;
         pwalletMain->StakeForCharityAddress = "";
         pwalletMain->nStakeForCharityPercent = 0;
-        return Value::null;
+    } else {
+        pwalletMain->StakeForCharityAddress = address;
+        pwalletMain->nStakeForCharityPercent = nPercentageDonation;
+        pwalletMain->fStakeForCharity = true;
     }
-
-    // For now max percentage is 25.
-    if (nPercentageDonation > 25)
-    {
-       nPercentageDonation = 25;
-    }
-
-    pwalletMain->StakeForCharityAddress = address;
-    pwalletMain->nStakeForCharityPercent = nPercentageDonation;
-    pwalletMain->fStakeForCharity = true;
 
     LOCK(pwalletMain->cs_wallet);
     {
-        bool fFileBacked = pwalletMain->fFileBacked;
-
-        Object result;
-        pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
         result.push_back(Pair("charity enabled set to ", int(pwalletMain->fStakeForCharity)));
         result.push_back(Pair("charity amount set to ", int(pwalletMain->nStakeForCharityPercent)));
         result.push_back(Pair("charity address set to ", int(pwalletMain->StakeForCharityAddress)));
 
-        if(fFileBacked)
+        if (pwalletMain->fFileBacked)
         {
             walletdb.WriteStakeForCharityEnabled(fStakeForCharity);
             walletdb.WriteStakeForCharityPercentage(nStakeForCharityPercent);
             walletdb.WriteStakeForCharityAddress(StakeForCharityAddress);
-            result.push_back(Pair("saved to wallet.dat ", "true"));
+            result.push_back(Pair("saved charity settings to wallet.dat ", "true"));
         } else {
-            result.push_back(Pair("saved to wallet.dat ", "false"));
+            result.push_back(Pair("saved charity settings to wallet.dat ", "false"));
         }
 
         return result;
