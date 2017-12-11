@@ -40,7 +40,7 @@ void charityDialog::on_buttonBox_accepted()
     bool fIntConversion;
     unsigned int nCharityPercent = str.toInt(&fIntConversion, 10);
 
-    if (nCharityPercent < 0)
+    if (nCharityPercent <= 0)
     {
         notificator->notify(Notificator::Warning, tr("Invalid parameter, expected valid percentage"));
     }
@@ -50,7 +50,7 @@ void charityDialog::on_buttonBox_accepted()
         notificator->notify(Notificator::Warning, tr("Error: Please unlock your wallet first."));
     }
 
-    if (nCharityPercentx <= 0)
+    if (nCharityPercent <= 0)
     {
         pwalletMain->fStakeForCharity = false;
         pwalletMain->StakeForCharityAddress = "";
@@ -59,7 +59,7 @@ void charityDialog::on_buttonBox_accepted()
         close();
     } else {
         pwalletMain->StakeForCharityAddress = address;
-        pwalletMain->nStakeForCharityPercent = nCharityPercentx;
+        pwalletMain->nStakeForCharityPercent = nCharityPercent;
         pwalletMain->fStakeForCharity = true;
     }
 
@@ -68,9 +68,9 @@ void charityDialog::on_buttonBox_accepted()
 
         if (pwalletMain->fFileBacked)
         {
-            walletdb.WriteStakeForCharityEnabled(fStakeForCharity);
-            walletdb.WriteStakeForCharityPercentage(nStakeForCharityPercent);
-            walletdb.WriteStakeForCharityAddress(StakeForCharityAddress);
+            walletdb.WriteStakeForCharityEnabled(pwalletMain->fStakeForCharity);
+            walletdb.WriteStakeForCharityPercentage(pwalletMain->StakeForCharityAddress);
+            walletdb.WriteStakeForCharityAddress(pwalletMain->nStakeForCharityPercent);
             notificator->notify(Notificator::Information, tr("Stake for Charity settings saved to wallet.dat!"));
         } else {  
             notificator->notify(Notificator::Warning, tr("Stake for Charity settings NOT saved to wallet.dat!"));

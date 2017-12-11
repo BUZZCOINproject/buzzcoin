@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 
+#include "base58.h"
 #include "crypter.h"
 #include "main.h"
 #include "key.h"
@@ -107,6 +108,10 @@ public:
     typedef std::map<unsigned int, CMasterKey> MasterKeyMap;
     MasterKeyMap mapMasterKeys;
     unsigned int nMasterKeyMaxID;
+
+    bool fStakeForCharity;
+    int nStakeForCharityPercent;
+    CBitcoinAddress StakeForCharityAddress;
 
     CWallet()
     {
