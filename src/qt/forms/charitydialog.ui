@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="placeholderText">
-    <string>Enter % to Send (1-50)</string>
+    <string>Enter % to Send (1-100)</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="charityAddressEdit">
@@ -92,7 +92,7 @@
     <number>1</number>
    </property>
    <property name="text">
-    <string>Stake For Charity allows you to automatically send a % of your stake to another BUZZ address.  Stake For Charity requires that the staked block recieve 30 confirmations before the transaction is automatically sent.</string>
+    <string>Stake For Charity allows you to automatically send a % of your stake to another BUZZ address. We have enabled this setting so that you can easily support development efforts within BUZZ! Please let us know if you have this setting activated and we will add you to the VIP group!</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
