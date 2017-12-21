@@ -30,10 +30,12 @@ void charityDialog::setModel(ClientModel *model)
 void charityDialog::on_buttonBox_accepted()
 {
     CBitcoinAddress address = ui->charityAddressEdit->text().toStdString();
+    Notificator *notificator;
+    notificator = new Notificator();
 
     if (!address.IsValid())
     {
-        notificator->notify(Notificator::Warning, tr("Invalid BUZZ address"));
+        notificator->notify(Notificator::Warning, tr("Invalid!"), tr("Ensure you are using a proper BUZZ address."));
     }
 
     QString str = ui->charityPercentEdit->text();
@@ -42,12 +44,12 @@ void charityDialog::on_buttonBox_accepted()
 
     if (nCharityPercent <= 0)
     {
-        notificator->notify(Notificator::Warning, tr("Invalid parameter, expected valid percentage"));
+        notificator->notify(Notificator::Warning, tr("Invalid!"), tr("expected valid percentage, please try again."));
     }
 
     if (pwalletMain->IsLocked())
     {
-        notificator->notify(Notificator::Warning, tr("Error: Please unlock your wallet first."));
+        notificator->notify(Notificator::Warning, tr("Error!"), tr("Please unlock your wallet first."));
     }
 
     if (nCharityPercent <= 0)
@@ -55,7 +57,7 @@ void charityDialog::on_buttonBox_accepted()
         pwalletMain->fStakeForCharity = false;
         pwalletMain->StakeForCharityAddress = "";
         pwalletMain->nStakeForCharityPercent = 0;
-        notificator->notify(Notificator::Information, tr("Stake for Charity Disabled!"));
+        notificator->notify(Notificator::Information, tr("Success!"), tr("Stake for Charity Disabled"));
         close();
     } else {
         pwalletMain->StakeForCharityAddress = address;
@@ -63,17 +65,19 @@ void charityDialog::on_buttonBox_accepted()
         pwalletMain->fStakeForCharity = true;
     }
 
+    CWalletDB walletdb(pwalletMain->strWalletFile);
+
     LOCK(pwalletMain->cs_wallet);
     {
 
         if (pwalletMain->fFileBacked)
         {
-            walletdb.WriteStakeForCharityEnabled(pwalletMain->fStakeForCharity);
-            walletdb.WriteStakeForCharityPercentage(pwalletMain->StakeForCharityAddress);
-            walletdb.WriteStakeForCharityAddress(pwalletMain->nStakeForCharityPercent);
-            notificator->notify(Notificator::Information, tr("Stake for Charity settings saved to wallet.dat!"));
+            walletdb.WriteStakeForCharityEnabled(nCharityPercent <= 0 ? false : true);
+            walletdb.WriteStakeForCharityPercentage(nCharityPercent);
+            walletdb.WriteStakeForCharityAddress(address.ToString());
+            notificator->notify(Notificator::Information, tr("Success!"), tr("Stake for Charity settings saved to wallet.dat!"));
         } else {  
-            notificator->notify(Notificator::Warning, tr("Stake for Charity settings NOT saved to wallet.dat!"));
+            notificator->notify(Notificator::Warning, tr("Failure!"), tr("Stake for Charity settings NOT saved to wallet.dat!"));
         }
     }
     close();
