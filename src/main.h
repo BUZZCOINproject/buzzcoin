@@ -1354,7 +1354,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
 // returns the minimum stake age based on 8 hours of time
 inline int GetMinStakeAge(CBlockIndex* pindex)
 {
-    int nHours = 8;
+    int nHours = 20;
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
 
@@ -1387,7 +1387,10 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 
 inline int64_t GetMaxStakeAge(CBlockIndex* pindex) {
     int nMinStakeAge = GetMinStakeAge(pindex);
-    return nMinStakeAge * 2;
+    int nMaxStakeAge = nMinStakeAge * 2;
+
+    // disallow stakes longer than 1 month.
+    return nMaxStakeAge >= 30 ? 30 : nMaxStakeAge;
 }
 
 #endif
