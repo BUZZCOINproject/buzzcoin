@@ -1326,9 +1326,10 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
         LogPrintf("GetCoinYearReward(): currentSupply=%.8f currentHeight=%d\n", fCurrentSupply, nCurrentHeight);
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
+    if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): legacy yearReward=1200\n");
+      
         return 1200 * CENT;
     }
 
@@ -1341,13 +1342,15 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     ) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
+      
         return 1200 * CENT;
     }
 
     // no reward after 20b
-    if (fCurrentSupply > 20000000) {
+    if (fCurrentSupply >= 20000000) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
+      
         return 0 * CENT;
     }
 
@@ -1360,7 +1363,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
 // returns the minimum stake age based on 8 hours of time
 inline int GetMinStakeAge(CBlockIndex* pindex)
 {
-    int nHours = 8;
+    int nHours = 20;
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
 
@@ -1368,6 +1371,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nCurrentHeight, nHours * 60 * 60);
+      
         return nHours * 60 * 60;
     }
 
@@ -1379,6 +1383,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     ) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): PowerBlock fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
+      
         return 0;
     }
 
@@ -1392,6 +1397,14 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
         LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
 
     return (nHours * nMultiplier) * 60 * 60;
+}
+
+inline int64_t GetMaxStakeAge(CBlockIndex* pindex) {
+    int nMinStakeAge = GetMinStakeAge(pindex);
+    int nMaxStakeAge = nMinStakeAge * 2;
+
+    // disallow stakes longer than 1 month.
+    return nMaxStakeAge >= 30 ? 30 : nMaxStakeAge;
 }
 
 #endif

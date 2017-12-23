@@ -1764,26 +1764,27 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, int64_t nValue, CWalletTx&
     return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, coinControl);
 }
 
-uint64_t CWallet::GetStakeWeight() const
+bool CWallet::GetStakeWeight(uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_t& nWeight)
 {
     // Choose coins to use
     int64_t nBalance = GetBalance();
 
-    if (nBalance <= nReserveBalance)
-        return 0;
+    if (nBalance <= nReserveBalance) {
+        return false;
+    }
 
     vector<const CWalletTx*> vwtxPrev;
 
     set<pair<const CWalletTx*,unsigned int> > setCoins;
     int64_t nValueIn = 0;
 
-    if (!SelectCoinsForStaking(nBalance - nReserveBalance, GetTime(), setCoins, nValueIn))
-        return 0;
+    if (!SelectCoinsForStaking(nBalance - nReserveBalance, GetTime(), setCoins, nValueIn)) {
+        return false;
+    }
 
-    if (setCoins.empty())
-        return 0;
-
-    uint64_t nWeight = 0;
+    if (setCoins.empty()) {
+        return false;
+    }
 
     int64_t nCurrentTime = GetTime();
     CTxDB txdb("r");
@@ -1797,9 +1798,25 @@ uint64_t CWallet::GetStakeWeight() const
 
         if (nCurrentTime - pcoin.first->nTime > GetMinStakeAge(pindexBest))
             nWeight += pcoin.first->vout[pcoin.second].nValue;
+
+
+        if (nBestHeight >= Params().PreStabilityRewardEnsuranceBlock()) {
+            int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, (int64_t)GetTime());
+            CBigNum bnCoinDayWeight = CBigNum(pcoin.first->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
+
+            // Weight is greater than zero, but the maximum value isn't reached yet
+            if (nTimeWeight && nTimeWeight < GetMaxStakeAge(pindexBest))
+                nMinWeight += bnCoinDayWeight.getuint64();
+
+            // Maximum weight was reached
+            if (nTimeWeight == GetMaxStakeAge(pindexBest))
+                nMaxWeight += bnCoinDayWeight.getuint64();            
+        } else {
+            nMinWeight = nWeight;
+        }
     }
 
-    return nWeight;
+    return true;
 }
 
 bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, int64_t nFees, CTransaction& txNew, CKey& key)

@@ -68,6 +68,7 @@ public:
     virtual const vector<CAddress>& FixedSeeds() const = 0;
     int RPCPort() const { return nRPCPort; }
     int LastPOWBlock() const { return nLastPOWBlock; }
+    int PreStabilityRewardEnsuranceBlock() const { return nPreStabilityRewardEnsuranceBlock; }
     int StabilitySoftFork() const { return nStabilityForkBlock; }
 protected:
     CChainParams() {};
@@ -85,6 +86,7 @@ protected:
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     int nLastPOWBlock;
     int nStabilityForkBlock;
+    int nPreStabilityRewardEnsuranceBlock;
 };
 
 /**
