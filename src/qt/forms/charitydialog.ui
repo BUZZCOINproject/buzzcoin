@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>S4C</string>
+   <string>BUZZ Development Fund Donations</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -75,7 +75,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Stake For Charity</string>
+    <string>Support Development!</string>
    </property>
    <property name="scaledContents">
     <bool>false</bool>
@@ -97,7 +97,7 @@
     <number>1</number>
    </property>
    <property name="text">
-    <string>Stake For Charity allows you to automatically send a % of your stake to another BUZZ address. We have enabled this setting so that you can easily support development efforts within BUZZ! Please let us know if you have this setting activated and we will add you to the VIP group!</string>
+    <string>The "Stake for Charity" feature allows you to automatically send a % of your stake to another BUZZ address. We have enabled this setting so that you can easily support development efforts within BUZZ! Please let us know if you have this setting activated and we will add you to the VIP group!</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

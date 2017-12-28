@@ -2121,7 +2121,7 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNe
         return strError;
     }
     
-    // stakeforcharity is the only allowable option to send coins when the fWalletUnlockStakingOnly flag is set.
+    // stakeforcharity is the only allowable option to send coins when the fAllowStakeForCharity flag is set.
     if (fWalletUnlockStakingOnly && !fAllowStakeForCharity)
     {
         string strError = _("Error: Wallet unlocked for staking only, unable to create transaction.");

@@ -195,7 +195,7 @@ Value stakeforcharity(const Array &params, bool fHelp)
         throw runtime_error(
             "stakeforcharity <BUZZaddress> <percent>\n"
             "Gives a percentage of a found stake to a different address, after stake matures\n"
-            "Percent is a whole number 1 to 25.\n"
+            "Percent is a whole number 0 to 100 (0 disables).\n"
             + HelpRequiringPassphrase());
 
     CBitcoinAddress address(params[0].get_str());

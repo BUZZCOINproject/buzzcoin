@@ -567,12 +567,10 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         }
         else if (strType == "stakeForCharityEnabled") 
         {
-            // TODO: https://stackoverflow.com/a/3613424/1475153 do we need to convert to boolean?
             ssValue >> pwallet->fStakeForCharity;
         }
         else if (strType == "stakeForCharityPercent") 
         {
-            // TODO: https://stackoverflow.com/a/7664227/1475153 do we need to convert to an int?
             ssValue >> pwallet->nStakeForCharityPercent;
         }
         else if (strType == "stakeForCharityAddress") 
