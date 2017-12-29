@@ -189,6 +189,69 @@ Value getaccountaddress(const Array& params, bool fHelp)
 }
 
 
+// stakeforcharity expects an address and a percentage input value
+Value stakeforcharity(const Array &params, bool fHelp)
+{
+    if (fHelp || params.size() != 2)
+        throw runtime_error(
+            "stakeforcharity <BUZZaddress> <percent>\n"
+            "Gives a percentage of a found stake to a different address, after stake matures\n"
+            "Percent is a whole number 0 to 100 (0 disables).\n"
+            + HelpRequiringPassphrase());
+
+    CBitcoinAddress address(params[0].get_str());
+
+    if (!address.IsValid())
+    {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid BUZZ address");
+    }
+
+    if (params[1].get_int() < 0)
+    {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
+    }
+
+    if (pwalletMain->IsLocked())
+    {
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
+    }
+
+    unsigned int nPercentageDonation = (unsigned int) params[1].get_int();
+
+    Object result;
+
+    // Turn off if we set to zero.
+    if (nPercentageDonation <= 0)
+    {
+        pwalletMain->fStakeForCharity = false;
+        pwalletMain->StakeForCharityAddress = "";
+        pwalletMain->nStakeForCharityPercent = 0;
+    } else {
+        pwalletMain->fStakeForCharity = true;
+        pwalletMain->StakeForCharityAddress = address.ToString();
+        pwalletMain->nStakeForCharityPercent = nPercentageDonation;
+    }
+
+    CWalletDB walletdb(pwalletMain->strWalletFile);
+    LOCK(pwalletMain->cs_wallet);
+    {
+        result.push_back(Pair("charity enabled set to ", int(pwalletMain->fStakeForCharity)));
+        result.push_back(Pair("charity amount set to ", int(pwalletMain->nStakeForCharityPercent)));
+        result.push_back(Pair("charity address set to ", pwalletMain->StakeForCharityAddress));
+
+        if (pwalletMain->fFileBacked)
+        {
+            walletdb.WriteStakeForCharityEnabled(pwalletMain->fStakeForCharity);
+            walletdb.WriteStakeForCharityAddress(pwalletMain->StakeForCharityAddress);
+            walletdb.WriteStakeForCharityPercentage(pwalletMain->nStakeForCharityPercent);
+            result.push_back(Pair("saved charity settings to wallet.dat ", "true"));
+        } else {
+            result.push_back(Pair("saved charity settings to wallet.dat ", "false"));
+        }
+
+        return result;
+    }
+}
 
 Value setaccount(const Array& params, bool fHelp)
 {
@@ -285,7 +348,7 @@ Value sendtoaddress(const Array& params, bool fHelp)
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
-    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx);
+    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx, false, false);
     if (strError != "")
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
