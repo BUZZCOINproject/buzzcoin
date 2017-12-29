@@ -146,6 +146,13 @@ bool CWalletDB::WriteMinVersion(int nVersion)
     return Write(std::string("minversion"), nVersion);
 }
 
+
+bool CWalletDB::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
+{
+    nWalletDBUpdated++;
+    return Write(std::string("stakeSplitThreshold"), nStakeSplitThreshold);
+}
+
 // --> Begin Stake For Charity
 bool CWalletDB::WriteStakeForCharityEnabled(bool fStakeForCharity)
 {
@@ -165,6 +172,7 @@ bool CWalletDB::WriteStakeForCharityAddress(string StakeForCharityAddress)
     return Write(std::string("stakeForCharityAddress"), StakeForCharityAddress);
 }
 // --> End Stake For Charity
+
 
 bool CWalletDB::ReadAccount(const string& strAccount, CAccount& account)
 {
@@ -564,6 +572,10 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         else if (strType == "orderposnext")
         {
             ssValue >> pwallet->nOrderPosNext;
+        }
+        else if (strType == "stakeSplitThreshold") 
+        {
+            ssValue >> pwallet->nStakeSplitThreshold;
         }
         else if (strType == "stakeForCharityEnabled") 
         {

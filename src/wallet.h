@@ -104,6 +104,7 @@ public:
     std::set<int64_t> setKeyPool;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
 
+    uint64_t nStakeSplitThreshold;
 
     typedef std::map<unsigned int, CMasterKey> MasterKeyMap;
     MasterKeyMap mapMasterKeys;
@@ -116,6 +117,7 @@ public:
     CWallet()
     {
         SetNull();
+	nStakeSplitThreshold = 1000000;
     }
 
     CWallet(std::string strWalletFileIn)
@@ -123,6 +125,7 @@ public:
         SetNull();
         strWalletFile = strWalletFileIn;
         fFileBacked = true;
+	nStakeSplitThreshold = 1000000;
     }
 
     void SetNull()

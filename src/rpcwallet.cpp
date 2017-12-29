@@ -12,6 +12,7 @@
 #include "util.h"
 #include "wallet.h"
 #include "walletdb.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace json_spirit;
@@ -1639,3 +1640,50 @@ Value settxfee(const Array& params, bool fHelp)
 
     return true;
 }
+
+Value setstakesplitthreshold(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "setstakesplitthreshold <1 - 25,000,000>\n"
+            "This will set the output size of your stakes to never be below this number\n");
+
+    uint64_t nStakeSplitThreshold = boost::lexical_cast<int>(params[0].get_str());
+    if (pwalletMain->IsLocked())
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Unlock wallet to use this feature");
+    if (nStakeSplitThreshold > 25000000)
+        return "out of range - setting split threshold failed\n Range 1 - 25,000,000";
+
+    CWalletDB walletdb(pwalletMain->strWalletFile);
+    LOCK(pwalletMain->cs_wallet);
+    {
+        bool fFileBacked = pwalletMain->fFileBacked;
+
+        Object result;
+        pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
+        result.push_back(Pair("split stake threshold set to ", int(pwalletMain->nStakeSplitThreshold)));
+        if(fFileBacked)
+        {
+            walletdb.WriteStakeSplitThreshold(nStakeSplitThreshold);
+            result.push_back(Pair("saved to wallet.dat ", "true"));
+        }
+        else
+            result.push_back(Pair("saved to wallet.dat ", "false"));
+
+        return result;
+    }
+}
+
+Value getstakesplitthreshold(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "getstakesplitthreshold\n"
+            "Returns the set splitstakethreshold\n");
+
+    Object result;
+    result.push_back(Pair("split stake threshold set to ", int(pwalletMain->nStakeSplitThreshold)));
+    return result;
+
+}
+
