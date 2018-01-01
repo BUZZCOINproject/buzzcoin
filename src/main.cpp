@@ -2357,7 +2357,7 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     LogPrintf("ProcessBlock: ACCEPTED\n");
 
 	// If turned on stakeforcharity, send a portion of stake reward to savings account address
-	if (pwalletMain->fStakeForCharity)
+	if (pwalletMain->fStakeForCharity && mapBlockIndex[hash]->nHeight < Params().StabilitySoftFork())
 		if (!pwalletMain->StakeForCharity())
 			LogPrint("s4c", "ERROR While trying to send portion of stake reward to savings account");
 
