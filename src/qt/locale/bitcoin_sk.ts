@@ -2772,8 +2772,8 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BuzzCoin upozornenie&quot; admi
     </message>
     <message>
         <location line="+6"/>
-        <source>Listen for connections on &lt;port&gt; (default: 15714 or testnet: 25714)</source>
-        <translation>Počúvať pripojenia na &lt;port&gt; (predvolené: 15714 alebo testovacia sieť: 25714)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 25128 or testnet: 25714)</source>
+        <translation>Počúvať pripojenia na &lt;port&gt; (predvolené: 25128 alebo testovacia sieť: 25714)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2822,8 +2822,8 @@ napríklad: alertnotify=echo %%s | mail -s &quot;BuzzCoin upozornenie&quot; admi
     </message>
     <message>
         <location line="+65"/>
-        <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
-        <translation>Počúvajte pre JSON-RPC spojenie na &lt;port&gt; (predvolené: 15715 alebo testovaciasieť: 25715)</translation>
+        <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 25129 or testnet: 20115)</source>
+        <translation>Počúvajte pre JSON-RPC spojenie na &lt;port&gt; (predvolené: 25129 alebo testovaciasieť: 20115)</translation>
     </message>
     <message>
         <location line="-17"/>
