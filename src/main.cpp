@@ -1073,6 +1073,12 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pind
 
     nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + 8);
 
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
+
+    if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
+        nSubsidy = MAX_MONEY - fCurrentSupply;
+    }
+
     LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d\n", FormatMoney(nSubsidy), nCoinAge);
 
     return nSubsidy;
