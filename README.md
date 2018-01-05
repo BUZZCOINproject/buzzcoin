@@ -26,24 +26,3 @@ proof-of-stake help further advance the field of crypto-currency.
 ./BuzzCoin-Qt.App/Contents/MacOS/BuzzCoin-Qt --debug # debug
 cd ~/Library/Application Support/BuzzCoin && tail -f debug.log # live debug output
 ```
-
-# TODO LIST
-
-## V3 Coin Minting Stability
-
-if block divisible by 1200, APR = 1200
-
-APR = 1200 - 1200 \* (CURRENT_COIN_SUPPLY / MAX_COIN_SUPPLY)
-
-&&
-
-if block divislble by 1200, MATURATION = instant
-
-MATURATION = CURRENT_SUPPLY (rounded down to nearest billion and strip all 0s)
-
-## Automated Fund to Development wallet.
-
-* [] create qt settings input field with checkbox -> bDonationCheckbox
-* [] allow minimum input of 2.5% of stake -> dPercentageDonation
-* [] enable larger inputs for dPercentageDonation
-* [] when stake is received, send automatic donation to sDevWalletAddress
