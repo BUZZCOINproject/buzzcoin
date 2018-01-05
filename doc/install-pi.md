@@ -12,9 +12,7 @@ Confirm with ‘Y’
 
 3. Install all dependancies	
 ```
-sudo apt-get install libboost-all-dev libssl-dev build-essential libdb++-dev libqrencode-dev libqt4-dev libminiupnpc-dev 
-qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools build-essential libboost-dev libboostsystem-dev 
-libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libdb++-dev libminiupnpc-dev
+sudo apt-get install libboost-all-dev libssl-dev build-essential libdb++-dev libqrencode-dev libqt4-dev libminiupnpc-dev qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools build-essential libboost-dev libboostsystem-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libdb++-dev libminiupnpc-dev
 ```
 Confirm with ‘Y’
 
