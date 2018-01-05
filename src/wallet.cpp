@@ -1976,24 +1976,17 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 if (txNew.GetCoinAge(txdb, nCoinAge, pindexPrev))
                 {
                     uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetProofOfStakeReward(nCoinAge, nFees, pindexPrev);
-                    if (nTotalSize / 2 > nStakeSplitThreshold * COIN)
+                    if (nTotalSize / 2 > nStakeSplitThreshold * COIN) {
                         txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
+                    }
                 }
 
-                if (fDebug && GetBoolArg("-printcoinstake",!fDebug))
+                if (fDebug && GetBoolArg("-printcoinstake",!fDebug)) {
                     printf("CreateCoinStake : added kernel type=%d\n", whichType);
+                }
+                
                 fKernelFound = true;
                 break;
-
-		/* Old code
-                if (GetWeight(nBlockTime, (int64_t)txNew.nTime) < GetStakeSplitAge())
-
-                if (GetWeight(nBlockTime, (int64_t)txNew.nTime, pindexPrev) < GetStakeSplitAge()) /// this is from stability build.
-
-                    txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
-                LogPrint("coinstake", "CreateCoinStake : added kernel type=%d\n", whichType);
-                fKernelFound = true;
-                break;*/
             }
         }
 

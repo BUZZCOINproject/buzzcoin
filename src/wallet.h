@@ -117,7 +117,7 @@ public:
     CWallet()
     {
         SetNull();
-	nStakeSplitThreshold = 1000000;
+	    nStakeSplitThreshold = 25000000;
     }
 
     CWallet(std::string strWalletFileIn)
@@ -125,7 +125,7 @@ public:
         SetNull();
         strWalletFile = strWalletFileIn;
         fFileBacked = true;
-	nStakeSplitThreshold = 1000000;
+	    nStakeSplitThreshold = 25000000;
     }
 
     void SetNull()

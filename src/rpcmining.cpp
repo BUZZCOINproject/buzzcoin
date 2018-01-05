@@ -84,6 +84,7 @@ Value getmininginfo(const Array& params, bool fHelp)
             "Returns an object containing mining-related information.");
 
     uint64_t nWeight, nMinWeight, nMaxWeight = 0;
+    
     if (pwalletMain) {
         pwalletMain->GetStakeWeight(nWeight, nMinWeight, nMaxWeight);
     }
