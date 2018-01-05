@@ -1862,13 +1862,21 @@ bool CWallet::GetStakeWeight(uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_
             int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, (int64_t)GetTime(), pindexBest);
             CBigNum bnCoinDayWeight = CBigNum(pcoin.first->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
 
+            // Weight is greater than zero
+            if (nTimeWeight > 0)
+            {
+                nWeight += bnCoinDayWeight.getuint64();
+            }
+
             // Weight is greater than zero, but the maximum value isn't reached yet
-            if (nTimeWeight && nTimeWeight < GetMaxStakeAge(pindexBest))
+            if (nTimeWeight && nTimeWeight < GetMaxStakeAge(pindexBest)) {
                 nMinWeight += bnCoinDayWeight.getuint64();
+            }
 
             // Maximum weight was reached
-            if (nTimeWeight == GetMaxStakeAge(pindexBest))
-                nMaxWeight += bnCoinDayWeight.getuint64();            
+            if (nTimeWeight == GetMaxStakeAge(pindexBest)){
+                nMaxWeight += bnCoinDayWeight.getuint64();
+            }       
         } else {
             nMinWeight = nWeight;
         }
