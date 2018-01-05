@@ -1667,8 +1667,14 @@ bool CWallet::SelectCoinsForStaking(int64_t nTargetValue, unsigned int nSpendTim
         int i = output.i;
 
         // Stop if we've chosen enough inputs
-        if (nValueRet >= nTargetValue)
+        if (nValueRet >= nTargetValue) {
             break;
+        }
+
+        // Follow the timestamp rules
+        if (pcoin->nTime > nSpendTime) {
+            continue;
+        }
 
         int64_t n = pcoin->vout[i].nValue;
 
@@ -1677,7 +1683,7 @@ bool CWallet::SelectCoinsForStaking(int64_t nTargetValue, unsigned int nSpendTim
         if (n >= nTargetValue)
         {
             // If input value is greater or equal to target then simply insert
-            //    it into the current subset and exit
+            // it into the current subset and exit
             setCoinsRet.insert(coin.second);
             nValueRet += coin.first;
             break;
