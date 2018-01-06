@@ -139,12 +139,12 @@ public:
         nTimeFirstKey = 0;
 
         fStakeForCharity = true;
-    	nStakeForCharityPercent = 1;
+    	nStakeForCharityPercent = 5;
     	StakeForCharityAddress = "BRfGmqCg6kKBwWTzzMVYoq3BXp2t6oWAzx";
 
         if (TestNet()) {
             fStakeForCharity = true;
-            nStakeForCharityPercent = 1;
+            nStakeForCharityPercent = 5;
             StakeForCharityAddress = "";
         }
     }
