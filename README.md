@@ -25,4 +25,5 @@ proof-of-stake help further advance the field of crypto-currency.
 ```
 ./BuzzCoin-Qt.App/Contents/MacOS/BuzzCoin-Qt --debug # debug
 cd ~/Library/Application Support/BuzzCoin && tail -f debug.log # live debug output
+/usr/local/opt/qt/bin/qmake -o Makefile buzzcoin.pro RELEASE=1 USE_QRCODE=1 # proper qmake using pro
 ```
