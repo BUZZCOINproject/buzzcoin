@@ -66,12 +66,19 @@ public:
         //    CTxOut(empty)
         //  vMerkleTree: 12630d16a9
         const char* pszTimestamp = "Buzzing The Industry...";
-        CTransaction txNew;
-        txNew.nTime = 1450569600;
-        txNew.vin.resize(1);
-        txNew.vout.resize(1);
-        txNew.vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
-        txNew.vout[0].SetEmpty();
+        std::vector<CTxIn> vin;
+        vin.resize(1);
+        vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+        std::vector<CTxOut> vout;
+        vout.resize(1);
+        vout[0].SetEmpty();
+        CTransaction txNew(1, 1450569600, vin, vout, 0);
+        // CTransaction txNew;
+        // txNew.nTime = 1450569600;
+        // txNew.vin.resize(1);
+        // txNew.vout.resize(1);
+        // txNew.vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+        // txNew.vout[0].SetEmpty();
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
@@ -80,20 +87,22 @@ public:
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce   = 410149;
 
-        hashGenesisBlock = genesis.GetHash(); 
+        hashGenesisBlock = genesis.GetHash();
 
         assert(hashGenesisBlock == uint256("0x00000ed9b0a3e9ac0424573f83b2c36c89db5d03d69bc95b15fe4df990ae478b"));
         assert(genesis.hashMerkleRoot == uint256("0xa3f3b2ee0cac84abfa6642f1d81daa37929e18be9503d370d800d6cba1533f00"));
-        
-        base58Prefixes[PUBKEY_ADDRESS] = list_of(25);
-        base58Prefixes[SCRIPT_ADDRESS] = list_of(85);
-        base58Prefixes[SECRET_KEY] =     list_of(153);
-        base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x04)(0x88)(0xC2)(0x1E);
-        base58Prefixes[EXT_SECRET_KEY] = list_of(0x04)(0x88)(0xA0)(0xE4);
+
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,25);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,85);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,153);
+        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x88)(0xC2)(0x1E).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x88)(0xA0)(0xE4).convert_to_container<std::vector<unsigned char> >();
 
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
         nLastPOWBlock = 0x7fffffff;
+        nPreStabilityRewardEnsuranceBlock = 935000;
+        nStabilityForkBlock = 950000;
     }
 
     virtual const CBlock& GenesisBlock() const { return genesis; }
@@ -130,19 +139,19 @@ public:
         strDataDir = "testnet";
 
         // Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nBits  = 520159231; 
+        genesis.nBits  = 520159231;
         genesis.nNonce = 17113;
-        hashGenesisBlock = genesis.GetHash(); 
+        hashGenesisBlock = genesis.GetHash();
         // assert(hashGenesisBlock == uint256("0x00000a336bf3e2be21c2ce9a3f9bc9849c697475d0de85e201bdc3452f3c343b"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
 
-        base58Prefixes[PUBKEY_ADDRESS] = list_of(127);
-        base58Prefixes[SCRIPT_ADDRESS] = list_of(196);
-        base58Prefixes[SECRET_KEY]     = list_of(239);
-        base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x04)(0x35)(0x87)(0xCF);
-        base58Prefixes[EXT_SECRET_KEY] = list_of(0x04)(0x35)(0x83)(0x94);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,127);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
+        base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,239);
+        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x35)(0x87)(0xCF).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x35)(0x83)(0x94).convert_to_container<std::vector<unsigned char> >();
 
         convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
 
@@ -174,9 +183,9 @@ void SelectParams(CChainParams::Network network) {
 }
 
 bool SelectParamsFromCommandLine() {
-    
+
     bool fTestNet = GetBoolArg("-testnet", false);
-    
+
     if (fTestNet) {
         SelectParams(CChainParams::TESTNET);
     } else {

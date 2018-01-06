@@ -5,6 +5,7 @@ INCLUDEPATH += src src/json src/qt
 QT += network
 DEFINES += ENABLE_WALLET
 DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
+DEFINES += QT_GUI
 CONFIG += no_include_pwd
 CONFIG += thread
 
@@ -29,13 +30,57 @@ UI_DIR = build
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
-    # Mac: compile for maximum compatibility (10.5, 32-bit)
-    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.5 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk
+    # Mac: compile for maximum compatibility (10.10, 64-bit)
+    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.10 -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 
     !windows:!macx {
         # Linux: static link
         LIBS += -Wl,-Bstatic
     }
+}
+
+isEmpty(MINIUPNPC_INCLUDE_PATH) {
+    macx:MINIUPNPC_INCLUDE_PATH = /usr/local/opt/miniupnpc/include
+}
+
+isEmpty(MINIUPNPC_LIB_PATH) {
+    macx:MINIUPNPC_LIB_PATH = /usr/local/opt/miniupnpc/lib
+}
+
+isEmpty(OPENSSL_INCLUDE_PATH) {
+    macx:OPENSSL_INCLUDE_PATH = /usr/local/opt/openssl/include
+}
+
+isEmpty(OPENSSL_LIB_PATH) {
+    macx:OPENSSL_LIB_PATH = /usr/local/opt/openssl/lib
+}
+
+isEmpty(BDB_LIB_PATH) {
+    macx:BDB_LIB_PATH = /usr/local/opt/berkeley-db@4/lib
+}
+
+isEmpty(BDB_LIB_SUFFIX) {
+    macx:BDB_LIB_SUFFIX = -4.8
+}
+
+isEmpty(BDB_INCLUDE_PATH) {
+    macx:BDB_INCLUDE_PATH = /usr/local/opt/berkeley-db@4/include
+}
+
+isEmpty(BOOST_LIB_PATH) {
+    macx:BOOST_LIB_PATH = /usr/local/opt/boost@1.60/lib
+}
+
+isEmpty(BOOST_INCLUDE_PATH) {
+    macx:BOOST_INCLUDE_PATH = /usr/local/opt/boost@1.60/include
+}
+
+isEmpty(QRENCODE_INCLUDE_PATH) {
+    macx:QRENCODE_INCLUDE_PATH = /usr/local/opt/qrencode/include
+}
+
+isEmpty(QRENCODE_LIB_PATH) {
+    macx:QRENCODE_LIB_PATH = /usr/local/opt/qrencode/lib
 }
 
 !win32 {
@@ -101,7 +146,7 @@ SOURCES += src/txdb-leveldb.cpp
         QMAKE_RANLIB = $$replace(QMAKE_STRIP, strip, ranlib)
     }
     LIBS += -lshlwapi
-    #genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libleveldb.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libmemenv.a
+    genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libleveldb.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libmemenv.a
 }
 genleveldb.target = $$PWD/src/leveldb/libleveldb.a
 genleveldb.depends = FORCE
@@ -149,6 +194,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/addressbookpage.h \
     src/qt/signverifymessagedialog.h \
     src/qt/aboutdialog.h \
+    src/qt/charitydialog.h \
     src/qt/editaddressdialog.h \
     src/qt/bitcoinaddressvalidator.h \
     src/alert.h \
@@ -171,7 +217,6 @@ HEADERS += src/qt/bitcoingui.h \
     src/core.h \
     src/main.h \
     src/miner.h \
-    src/irc.h \
     src/net.h \
     src/key.h \
     src/db.h \
@@ -239,6 +284,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/addressbookpage.cpp \
     src/qt/signverifymessagedialog.cpp \
     src/qt/aboutdialog.cpp \
+    src/qt/charitydialog.cpp \
     src/qt/editaddressdialog.cpp \
     src/qt/bitcoinaddressvalidator.cpp \
     src/alert.cpp \
@@ -255,7 +301,6 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/main.cpp \
     src/miner.cpp \
     src/init.cpp \
-    src/irc.cpp \
     src/net.cpp \
     src/checkpoints.cpp \
     src/addrman.cpp \
@@ -316,6 +361,7 @@ FORMS += \
     src/qt/forms/addressbookpage.ui \
     src/qt/forms/signverifymessagedialog.ui \
     src/qt/forms/aboutdialog.ui \
+    src/qt/forms/charitydialog.ui \
     src/qt/forms/editaddressdialog.ui \
     src/qt/forms/transactiondescdialog.ui \
     src/qt/forms/overviewpage.ui \
@@ -364,26 +410,6 @@ isEmpty(BOOST_THREAD_LIB_SUFFIX) {
     else:BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
 }
 
-isEmpty(BDB_LIB_PATH) {
-    macx:BDB_LIB_PATH = /opt/local/lib/db48
-}
-
-isEmpty(BDB_LIB_SUFFIX) {
-    macx:BDB_LIB_SUFFIX = -4.8
-}
-
-isEmpty(BDB_INCLUDE_PATH) {
-    macx:BDB_INCLUDE_PATH = /opt/local/include/db48
-}
-
-isEmpty(BOOST_LIB_PATH) {
-    macx:BOOST_LIB_PATH = /opt/local/lib
-}
-
-isEmpty(BOOST_INCLUDE_PATH) {
-    macx:BOOST_INCLUDE_PATH = /opt/local/include
-}
-
 windows:DEFINES += WIN32
 windows:RC_FILE = src/qt/res/bitcoin-qt.rc
 
@@ -398,16 +424,19 @@ windows:!contains(MINGW_THREAD_BUGFIX, 0) {
     QMAKE_LIBS_QT_ENTRY = -lmingwthrd $$QMAKE_LIBS_QT_ENTRY
 }
 
-macx:HEADERS += src/qt/macdockiconhandler.h
-macx:OBJECTIVE_SOURCES += src/qt/macdockiconhandler.mm
+macx:HEADERS += src/qt/macnotificationhandler.h src/qt/macdockiconhandler.h
+macx:OBJECTIVE_SOURCES += src/qt/macnotificationhandler.mm src/qt/macdockiconhandler.mm
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit
 macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
-macx:ICON = src/qt/res/icons/bitcoin.icns
+macx:ICON = src/qt/res/icons/buzzcoin.icns
 macx:TARGET = "BuzzCoin-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread
 macx:QMAKE_INFO_PLIST = share/qt/Info.plist
+macx:QMAKE_FLAGS_RPATH =
+macx:QMAKE_LFLAGS += -Wl,-rpath,/Users/andrea/Qt/5.6/clang_64/lib
+macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
