@@ -1357,7 +1357,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     if (fDebug)
         LogPrintf("GetCoinYearReward(): yearReward=%.8f\n", 1200 - (1200 * (fCurrentSupply/MAX_MONEY)));
 
-    return 1200 - (1200 * (fCurrentSupply/MAX_MONEY)) * CENT;
+    return min(1200 - (1200 * (fCurrentSupply/MAX_MONEY)), 2.5) * CENT;
 }
 
 // returns the minimum stake age based on 8 hours of time
