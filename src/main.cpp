@@ -1047,9 +1047,11 @@ static CBigNum GetProofOfStakeLimit(int nHeight)
 
 // miner's coin base reward
 time_t t=time(NULL);
-int64_t GetProofOfWorkReward(int64_t nFees)
+int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
 {
     int64_t nSubsidy = 10 * COIN;
+
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
 
     if (TestNet()) {
         // We mine 1 billion every 500 blocks to test new APR
@@ -1060,10 +1062,19 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
 
-    if (t > 1505852400)
+    if (t > 1505852400 && fCurrentSupply <= MAX_MONEY) {
         return nSubsidy;
-    else
-        return nSubsidy + (nFees / 2);
+    }
+
+    if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
+        return MAX_MONEY - fCurrentSupply;
+    }
+    
+    if (fCurrentSupply >= MAX_MONEY) {
+        return 0;
+    }
+
+    return nSubsidy + (nFees / 2);
 }
 
 // stakers's coin stake reward
@@ -1597,7 +1608,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 
     if (IsProofOfWork())
     {
-        int64_t nReward = GetProofOfWorkReward(nFees);
+        int64_t nReward = GetProofOfWorkReward(nFees, pindex);
         // Check coinbase reward
         if (vtx[0].GetValueOut() > nReward)
             return DoS(50, error("ConnectBlock() : coinbase reward exceeded (actual=%d vs calculated=%d)",
