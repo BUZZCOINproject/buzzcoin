@@ -64,7 +64,7 @@ void charityDialog::on_buttonBox_accepted()
     if (nCharityPercent == 0)
     {
         pwalletMain->fStakeForCharity = false;
-        notificator->notify(Notificator::Information, tr("Success!"), tr("Stake for Charity Disabled"));
+        notificator->notify(Notificator::Information, tr("Success!"), tr("Development Support Disabled"));
     } else {
         pwalletMain->fStakeForCharity = true;
     }
@@ -81,9 +81,9 @@ void charityDialog::on_buttonBox_accepted()
             walletdb.WriteStakeForCharityEnabled(nCharityPercent <= 0 ? false : true);
             walletdb.WriteStakeForCharityPercentage(nCharityPercent);
             walletdb.WriteStakeForCharityAddress(address.ToString());
-            notificator->notify(Notificator::Information, tr("Success!"), tr("Stake for Charity settings saved to wallet.dat!"));
+            notificator->notify(Notificator::Information, tr("Success!"), tr("Development Support settings saved to wallet.dat!"));
         } else {  
-            notificator->notify(Notificator::Warning, tr("Failure!"), tr("Stake for Charity settings NOT saved to wallet.dat!"));
+            notificator->notify(Notificator::Warning, tr("Failure!"), tr("Development Support settings NOT saved to wallet.dat!"));
         }
     }
     close();
