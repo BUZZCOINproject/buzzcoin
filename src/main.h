@@ -1388,7 +1388,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     }
 
     if (TestNet()) {
-        nHours = 1;
+        return 10 * 60;
     }
 
     int nMultiplier = fCurrentSupply / 1000000;

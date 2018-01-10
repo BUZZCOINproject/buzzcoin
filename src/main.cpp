@@ -1054,8 +1054,10 @@ int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
 
     if (TestNet()) {
-        // We mine 1 billion every 500 blocks to test new APR
-        if(pindexBest->nHeight == 1) { nSubsidy = 10000000 * COIN; }
+        // We mine 33K every block up to ~10M
+        if(pindexBest->nHeight <= 300) {
+            nSubsidy = 33000 * COIN;
+        }
     } else {
         if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
     }
