@@ -189,12 +189,12 @@ Value getaccountaddress(const Array& params, bool fHelp)
 }
 
 
-// stakeforcharity expects an address and a percentage input value
-Value stakeforcharity(const Array &params, bool fHelp)
+// setstakeforcharity expects an address and a percentage input value
+Value setstakeforcharity(const Array &params, bool fHelp)
 {
     if (fHelp || params.size() != 2) {
         throw runtime_error(
-            "stakeforcharity <BUZZaddress> <percent>\n"
+            "setstakeforcharity <BUZZaddress> <percent>\n"
             "Gives a percentage of a found stake to a different address, after stake matures\n"
             "Percent is a whole number 0 to 100 (0 disables).\n"
             + HelpRequiringPassphrase());
@@ -245,6 +245,21 @@ Value stakeforcharity(const Array &params, bool fHelp)
 
         return result;
     }
+}
+
+Value getstakeforcharity(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "getstakeforcharity\n"
+            "Returns the set stakeforcharity parameters\n"
+        );
+
+    Object result;
+    result.push_back(Pair("charity enabled set to ", int(pwalletMain->fStakeForCharity)));
+    result.push_back(Pair("charity amount set to ", int(pwalletMain->nStakeForCharityPercent)));
+    result.push_back(Pair("charity address set to ", pwalletMain->StakeForCharityAddress));
+    return result;
 }
 
 Value setaccount(const Array& params, bool fHelp)
