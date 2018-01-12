@@ -177,4 +177,13 @@ extern json_spirit::Value getblock(const json_spirit::Array& params, bool fHelp)
 extern json_spirit::Value getblockbynumber(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getcheckpoint(const json_spirit::Array& params, bool fHelp);
 
+
+extern json_spirit::Value setstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
+
+
+extern json_spirit::Value setstakeforcharity(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getstakeforcharity(const json_spirit::Array& params, bool fHelp);
+
+
 #endif

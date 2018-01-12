@@ -1140,7 +1140,7 @@ void CWallet::AvailableCoinsForStaking(vector<COutput>& vCoins, unsigned int nSp
             const CWalletTx* pcoin = &(*it).second;
 
             // Filtering by tx timestamp instead of block timestamp may give false positives but never false negatives
-            if (pcoin->nTime + GetMinStakeAge() > nSpendTime)
+            if (pcoin->nTime + GetMinStakeAge(pindexBest) > nSpendTime)
                 continue;
 
             if (pcoin->GetBlocksToMaturity() > 0)
@@ -1229,6 +1229,58 @@ int64_t CWallet::GetNewMint() const
     }
     return nTotal;
 }
+
+bool CWallet::StakeForCharity()
+{
+    if ( IsInitialBlockDownload() || IsLocked() )
+    {
+        return false;
+    }
+
+    if (StakeForCharityAddress.length() == 0) {
+        return false;
+    }
+
+    CWalletTx wtx;
+    int64_t nNet = 0;
+    CBitcoinAddress charityAddress = StakeForCharityAddress;
+
+    {
+        LOCK(cs_wallet);
+        for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+        {
+            const CWalletTx* pcoin = &(*it).second;
+            if (pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() == 0 && pcoin->GetDepthInMainChain() == nCoinbaseMaturity + 20)
+            {
+                // Calculate Amount for Charity
+                nNet = (( pcoin->GetCredit() - pcoin->GetDebit()) * nStakeForCharityPercent) / 100;
+
+                // Do not send if amount is too low
+                if (nNet < MIN_TX_FEE )
+                {
+                    LogPrint("s4c",
+                        "StakeForCharity(): Amount: %s is below MIN_TX_FEE: %s\n",
+                        FormatMoney(nNet).c_str(),
+                        FormatMoney(MIN_TX_FEE).c_str()
+                    );
+
+                    return false;
+                }
+
+                LogPrint("s4c",
+                    "StakeForCharity(): Sending: %s to Address: %s\n",
+                    FormatMoney(nNet).c_str(),
+                    charityAddress.ToString().c_str()
+                );
+                
+                SendMoneyToDestination(charityAddress.Get(), nNet, wtx, false, true);
+            }
+        }
+    }
+
+    return true;
+}
+
 
 struct LargerOrEqualThanThreshold
 {
@@ -1615,8 +1667,14 @@ bool CWallet::SelectCoinsForStaking(int64_t nTargetValue, unsigned int nSpendTim
         int i = output.i;
 
         // Stop if we've chosen enough inputs
-        if (nValueRet >= nTargetValue)
+        if (nValueRet >= nTargetValue) {
             break;
+        }
+
+        // Follow the timestamp rules
+        if (pcoin->nTime > nSpendTime) {
+            continue;
+        }
 
         int64_t n = pcoin->vout[i].nValue;
 
@@ -1625,7 +1683,7 @@ bool CWallet::SelectCoinsForStaking(int64_t nTargetValue, unsigned int nSpendTim
         if (n >= nTargetValue)
         {
             // If input value is greater or equal to target then simply insert
-            //    it into the current subset and exit
+            // it into the current subset and exit
             setCoinsRet.insert(coin.second);
             nValueRet += coin.first;
             break;
@@ -1764,26 +1822,27 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, int64_t nValue, CWalletTx&
     return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, coinControl);
 }
 
-uint64_t CWallet::GetStakeWeight() const
+bool CWallet::GetStakeWeight(uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_t& nWeight)
 {
     // Choose coins to use
     int64_t nBalance = GetBalance();
 
-    if (nBalance <= nReserveBalance)
-        return 0;
+    if (nBalance <= nReserveBalance) {
+        return false;
+    }
 
     vector<const CWalletTx*> vwtxPrev;
 
     set<pair<const CWalletTx*,unsigned int> > setCoins;
     int64_t nValueIn = 0;
 
-    if (!SelectCoinsForStaking(nBalance - nReserveBalance, GetTime(), setCoins, nValueIn))
-        return 0;
+    if (!SelectCoinsForStaking(nBalance - nReserveBalance, GetTime(), setCoins, nValueIn)) {
+        return false;
+    }
 
-    if (setCoins.empty())
-        return 0;
-
-    uint64_t nWeight = 0;
+    if (setCoins.empty()) {
+        return false;
+    }
 
     int64_t nCurrentTime = GetTime();
     CTxDB txdb("r");
@@ -1795,11 +1854,35 @@ uint64_t CWallet::GetStakeWeight() const
         if (!txdb.ReadTxIndex(pcoin.first->GetHash(), txindex))
             continue;
 
-        if (nCurrentTime - pcoin.first->nTime > GetMinStakeAge())
+        if (nCurrentTime - pcoin.first->nTime > GetMinStakeAge(pindexBest))
             nWeight += pcoin.first->vout[pcoin.second].nValue;
+
+
+        if (nBestHeight >= Params().PreStabilityRewardEnsuranceBlock()) {
+            int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, (int64_t)GetTime(), pindexBest);
+            CBigNum bnCoinDayWeight = CBigNum(pcoin.first->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
+
+            // Weight is greater than zero
+            if (nTimeWeight > 0)
+            {
+                nWeight += bnCoinDayWeight.getuint64();
+            }
+
+            // Weight is greater than zero, but the maximum value isn't reached yet
+            if (nTimeWeight && nTimeWeight < GetMaxStakeAge(pindexBest)) {
+                nMinWeight += bnCoinDayWeight.getuint64();
+            }
+
+            // Maximum weight was reached
+            if (nTimeWeight == GetMaxStakeAge(pindexBest)){
+                nMaxWeight += bnCoinDayWeight.getuint64();
+            }       
+        } else {
+            nMinWeight = nWeight;
+        }
     }
 
-    return nWeight;
+    return true;
 }
 
 bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, int64_t nFees, CTransaction& txNew, CKey& key)
@@ -1901,9 +1984,21 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 vwtxPrev.push_back(pcoin.first);
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
-                if (GetWeight(nBlockTime, (int64_t)txNew.nTime) < GetStakeSplitAge())
-                    txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
-                LogPrint("coinstake", "CreateCoinStake : added kernel type=%d\n", whichType);
+
+                uint64_t nCoinAge;
+                CTxDB txdb("r");
+                if (txNew.GetCoinAge(txdb, nCoinAge, pindexPrev))
+                {
+                    uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetProofOfStakeReward(nCoinAge, nFees, pindexPrev);
+                    if (nTotalSize / 2 > nStakeSplitThreshold * COIN) {
+                        txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
+                    }
+                }
+
+                if (fDebug && GetBoolArg("-printcoinstake",!fDebug)) {
+                    printf("CreateCoinStake : added kernel type=%d\n", whichType);
+                }
+                
                 fKernelFound = true;
                 break;
             }
@@ -1923,7 +2018,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         if (txNew.vout.size() == 2 && ((pcoin.first->vout[pcoin.second].scriptPubKey == scriptPubKeyKernel || pcoin.first->vout[pcoin.second].scriptPubKey == txNew.vout[1].scriptPubKey))
             && pcoin.first->GetHash() != txNew.vin[0].prevout.hash)
         {
-            int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, (int64_t)txNew.nTime);
+            int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, (int64_t)txNew.nTime, pindexPrev);
 
             // Stop adding more inputs if already too many inputs
             if (txNew.vin.size() >= 100)
@@ -1938,7 +2033,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             if (pcoin.first->vout[pcoin.second].nValue >= GetStakeCombineThreshold())
                 continue;
             // Do not add input that is still too young
-            if (nTimeWeight < GetMinStakeAge())
+            if (nTimeWeight < GetMinStakeAge(pindexBest))
                 continue;
 
             txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
@@ -1951,10 +2046,10 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     {
         uint64_t nCoinAge;
         CTxDB txdb("r");
-        if (!txNew.GetCoinAge(txdb, nCoinAge))
+        if (!txNew.GetCoinAge(txdb, nCoinAge, pindexPrev))
             return error("CreateCoinStake : failed to calculate coin age");
 
-        int64_t nReward = GetProofOfStakeReward(nCoinAge, nFees);
+        int64_t nReward = GetProofOfStakeReward(nCoinAge, nFees, pindexPrev);
         if (nReward <= 0)
             return false;
 
@@ -2040,7 +2135,7 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey)
 
 
 
-string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, bool fAskFee)
+string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, bool fAskFee, bool fAllowStakeForCharity)
 {
     CReserveKey reservekey(this);
     int64_t nFeeRequired;
@@ -2051,12 +2146,15 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNe
         LogPrintf("SendMoney() : %s", strError);
         return strError;
     }
-    if (fWalletUnlockStakingOnly)
+    
+    // StakeForCharity is the only allowable option to send coins when the fAllowStakeForCharity flag is set.
+    if (fWalletUnlockStakingOnly && !fAllowStakeForCharity)
     {
         string strError = _("Error: Wallet unlocked for staking only, unable to create transaction.");
         LogPrintf("SendMoney() : %s", strError);
         return strError;
     }
+
     if (!CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired))
     {
         string strError;
@@ -2079,7 +2177,7 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNe
 
 
 
-string CWallet::SendMoneyToDestination(const CTxDestination& address, int64_t nValue, CWalletTx& wtxNew, bool fAskFee)
+string CWallet::SendMoneyToDestination(const CTxDestination& address, int64_t nValue, CWalletTx& wtxNew, bool fAskFee, bool fAllowStakeForCharity)
 {
     // Check amount
     if (nValue <= 0)
@@ -2091,7 +2189,7 @@ string CWallet::SendMoneyToDestination(const CTxDestination& address, int64_t nV
     CScript scriptPubKey;
     scriptPubKey.SetDestination(address);
 
-    return SendMoney(scriptPubKey, nValue, wtxNew, fAskFee);
+    return SendMoney(scriptPubKey, nValue, wtxNew, fAskFee, fAllowStakeForCharity);
 }
 
 

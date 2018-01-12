@@ -38,81 +38,6 @@ set<pair<COutPoint, unsigned int>> setStakeSeen;
 CBigNum bnProofOfStakeLimit(~uint256(0) >> 20);
 CBigNum bnProofOfStakeLimitV2(~uint256(0) >> 20);
 
-unsigned int GetMinStakeAge()
-{
-    int nHours = 8;
-
-    // TODO: get current block -> nCurrentBlock
-    // TODO: get current supply -> nCurrentSupply
-
-    if (pindexBest % 1200)
-    {
-        nHours = 1;
-    }
-    else if (nCurrentSupply >= 5000000000 && nCurrentSupply <= 6000000000)
-    {
-        nHours = nHours * 2
-    }
-    else if (nCurrentSupply >= 6000000000 && nCurrentSupply <= 7000000000)
-    {
-        nHours = nHours * 3
-    }
-    else if (nCurrentSupply >= 7000000000 && nCurrentSupply <= 8000000000)
-    {
-        nHours = nHours * 4
-    }
-    else if (nCurrentSupply >= 8000000000 && nCurrentSupply <= 9000000000)
-    {
-        nHours = nHours * 5
-    }
-    else if (nCurrentSupply >= 9000000000 && nCurrentSupply <= 10000000000)
-    {
-        nHours = nHours * 6
-    }
-    else if (nCurrentSupply >= 10000000000 && nCurrentSupply <= 11000000000)
-    {
-        nHours = nHours * 7
-    }
-    else if (nCurrentSupply >= 11000000000 && nCurrentSupply <= 12000000000)
-    {
-        nHours = nHours * 8
-    }
-    else if (nCurrentSupply >= 12000000000 && nCurrentSupply <= 13000000000)
-    {
-        nHours = nHours * 9
-    }
-    else if (nCurrentSupply >= 13000000000 && nCurrentSupply <= 14000000000)
-    {
-        nHours = nHours * 10
-    }
-    else if (nCurrentSupply >= 14000000000 && nCurrentSupply <= 15000000000)
-    {
-        nHours = nHours * 11
-    }
-    else if (nCurrentSupply >= 15000000000 && nCurrentSupply <= 16000000000)
-    {
-        nHours = nHours * 14
-    }
-    else if (nCurrentSupply >= 16000000000 && nCurrentSupply <= 17000000000)
-    {
-        nHours = nHours * 15
-    }
-    else if (nCurrentSupply >= 17000000000 && nCurrentSupply <= 18000000000)
-    {
-        nHours = nHours * 16
-    }
-    else if (nCurrentSupply >= 18000000000 && nCurrentSupply <= 19000000000)
-    {
-        nHours = nHours * 17
-    }
-    else if (nCurrentSupply >= 19000000000 && nCurrentSupply <= 20000000000)
-    {
-        nHours = nHours * 18
-    }
-
-    return nHours * 60 * 60; // 8 hours
-}
-
 unsigned int nModifierInterval = 8 * 60; // time to elapse before new modifier is computed
 
 int nCoinbaseMaturity = 188;
@@ -690,17 +615,15 @@ static const time_t Fork3 = 1506157251;
 
 int64_t GetMinFee(const CTransaction &tx, unsigned int nBlockSize, enum GetMinFee_mode mode, unsigned int nBytes)
 {
-    int64_t TransactionFeeDivider;
-    time_t t = time(NULL);
-    if (t > ForkTiming)
-    {
-        TransactionFeeDivider = TransactionFeeDivider_V2;
-    }
-    else
-    {
+int64_t TransactionFeeDivider;
+	time_t t=time(NULL);
+        if(t>ForkTiming)
+	{
+		TransactionFeeDivider = TransactionFeeDivider_V2;
+	} else {
         TransactionFeeDivider = TransactionFeeDivider_V1;
     }
-
+	
     // Base fee is either nMinTxFee or nMinRelayTxFee
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
     int64_t nMinFee = (1 + (int64_t)nBytes / 1000) * nBaseFee;
@@ -713,12 +636,13 @@ int64_t GetMinFee(const CTransaction &tx, unsigned int nBlockSize, enum GetMinFe
     if (t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin && mode == GMF_SEND))
     {
         int64_t nNewMinFee = 0;
-        int64_t prevNvalue = 0;
-
-        BOOST_FOREACH (const CTxOut &txout, tx.vout)
+        BOOST_FOREACH(const CTxOut& txout, tx.vout)
         {
-            bool found = true; //do not add fees when sending to the same address (this can be used for restructuring large single inputs)
-            BOOST_FOREACH (const CTxIn &txin, tx.vin)
+            // do not add fees when sending to the same address
+            // - this can be used for restructuring large single inputs
+            bool found=true; 
+
+            BOOST_FOREACH(const CTxIn& txin, tx.vin)
             {
                 if (txin.prevout.hash == txout.GetHash())
                 {
@@ -731,15 +655,14 @@ int64_t GetMinFee(const CTransaction &tx, unsigned int nBlockSize, enum GetMinFe
             }
             if (!found)
             {
-                // TODO IMPROve
-                if (t > Fork3)
-                {
+                // TODO: IMPROVE
+                if (t > Fork3){
                     nNewMinFee = (txout.nValue / 100000) * 1;
-                }
-                else
-                {
+                } 
+                else {
                     nNewMinFee = (txout.nValue / 100) * 25;
                 }
+                
             }
             if (t > Fork3)
             {
@@ -752,18 +675,19 @@ int64_t GetMinFee(const CTransaction &tx, unsigned int nBlockSize, enum GetMinFe
         }
         nMinFee += nNewMinFee;
     }
-    if (nMinFee > COIN * 1000000000) // max 1 billion coins fee.
+    if(nMinFee > COIN*1000000000) // max 1 billion coins fee.
     {
         nMinFee = COIN * 1000000000;
     }
-
-    if (!MoneyRange(nMinFee))
+	
+    if (!MoneyRange(nMinFee)) {
         nMinFee = MAX_MONEY;
+    }
+
     return nMinFee;
 }
 
-bool AcceptToMemoryPool(CTxMemPool &pool, CTransaction &tx, bool fLimitFree,
-                        bool *pfMissingInputs)
+bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree, bool* pfMissingInputs)
 {
     AssertLockHeld(cs_main);
     if (pfMissingInputs)
@@ -1118,103 +1042,51 @@ static CBigNum GetProofOfStakeLimit(int nHeight)
 }
 
 // miner's coin base reward
-time_t t = time(NULL);
-int64_t GetProofOfWorkReward(int64_t nFees)
+time_t t=time(NULL);
+int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
 {
     int64_t nSubsidy = 10 * COIN;
-    if (pindexBest->nHeight == 1)
-    {
-        nSubsidy = 100000 * COIN;
+
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
+
+    if (TestNet()) {
+        // We mine 33K every block up to ~10M
+        if(pindexBest->nHeight <= 300) {
+            nSubsidy = 33000 * COIN;
+        }
+    } else {
+        if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
     }
+
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
 
-    if (t > 1505852400)
-    {
+    if (t > 1505852400 && fCurrentSupply <= MAX_MONEY) {
         return nSubsidy;
     }
-    else
-        return nSubsidy + (nFees / 2);
-}
 
-static const int64_t COIN_YEAR_REWARD = 1200 * CENT; // 1% per year
-// miner's coin stake reward
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
-{
-    // TODO: get current coin supply -> nCurrentSupply
-    // TODO: get current block -> nCurrentBlock
-
-    int nDescalation = 0;
-
-    if (nCurrentBlock % 1200)
-    {
-        LogPrint("PoS REWARD", "%d block divisible by 1200, reward APR 1200 yearly", nCurrentBlock);
+    if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
+        return MAX_MONEY - fCurrentSupply;
     }
-    else if (nCurrentSupply >= 5000000000 && nCurrentSupply <= 6000000000)
-    {
-        nDescalation = 5 / 20;
-    }
-    else if (nCurrentSupply >= 6000000000 && nCurrentSupply <= 7000000000)
-    {
-        nDescalation = 6 / 20;
-    }
-    else if (nCurrentSupply >= 7000000000 && nCurrentSupply <= 8000000000)
-    {
-        nDescalation = 7 / 20;
-    }
-    else if (nCurrentSupply >= 8000000000 && nCurrentSupply <= 9000000000)
-    {
-        nDescalation = 8 / 20;
-    }
-    else if (nCurrentSupply >= 9000000000 && nCurrentSupply <= 10000000000)
-    {
-        nDescalation = 9 / 20;
-    }
-    else if (nCurrentSupply >= 10000000000 && nCurrentSupply <= 11000000000)
-    {
-        nDescalation = 10 / 20;
-    }
-    else if (nCurrentSupply >= 11000000000 && nCurrentSupply <= 12000000000)
-    {
-        nDescalation = 11 / 20;
-    }
-    else if (nCurrentSupply >= 12000000000 && nCurrentSupply <= 13000000000)
-    {
-        nDescalation = 12 / 20;
-    }
-    else if (nCurrentSupply >= 13000000000 && nCurrentSupply <= 14000000000)
-    {
-        nDescalation = 13 / 20;
-    }
-    else if (nCurrentSupply >= 14000000000 && nCurrentSupply <= 15000000000)
-    {
-        nDescalation = 14 / 20;
-    }
-    else if (nCurrentSupply >= 15000000000 && nCurrentSupply <= 16000000000)
-    {
-        nDescalation = 15 / 20;
-    }
-    else if (nCurrentSupply >= 16000000000 && nCurrentSupply <= 17000000000)
-    {
-        nDescalation = 16 / 20;
-    }
-    else if (nCurrentSupply >= 17000000000 && nCurrentSupply <= 18000000000)
-    {
-        nDescalation = 17 / 20;
-    }
-    else if (nCurrentSupply >= 18000000000 && nCurrentSupply <= 19000000000)
-    {
-        nDescalation = 18 / 20;
-    }
-    else if (nCurrentSupply >= 19000000000 && nCurrentSupply <= 20000000000)
-    {
-        nDescalation = 19 / 20;
-    }
-    else if (nCurrentSupply >= 20000000000)
-    {
+    
+    if (fCurrentSupply >= MAX_MONEY) {
         return 0;
     }
 
-    int64_t nSubsidy = nCoinAge * (COIN_YEAR_REWARD - (COIN_YEAR_REWARD * nDescalation)) * 33 / (365 * 33 + GetMinStakeAge());
+    return nSubsidy + (nFees / 2);
+}
+
+// stakers's coin stake reward
+int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pindex)
+{
+    int64_t nSubsidy;
+
+    nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + 8);
+
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
+
+    if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
+        nSubsidy = MAX_MONEY - fCurrentSupply;
+    }
 
     LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d\n", FormatMoney(nSubsidy), nCoinAge);
 
@@ -1222,7 +1094,6 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 }
 
 static const int64_t nTargetTimespan = 120; // 16 mins
-
 //
 // maximum nBits value could possible be required nTime after
 //
@@ -1722,7 +1593,7 @@ bool CBlock::ConnectBlock(CTxDB &txdb, CBlockIndex *pindex, bool fJustCheck)
 
     if (IsProofOfWork())
     {
-        int64_t nReward = GetProofOfWorkReward(nFees);
+        int64_t nReward = GetProofOfWorkReward(nFees, pindex);
         // Check coinbase reward
         if (vtx[0].GetValueOut() > nReward)
             return DoS(50, error("ConnectBlock() : coinbase reward exceeded (actual=%d vs calculated=%d)",
@@ -1733,12 +1604,12 @@ bool CBlock::ConnectBlock(CTxDB &txdb, CBlockIndex *pindex, bool fJustCheck)
     {
         // ppcoin: coin stake tx earns reward instead of paying fee
         uint64_t nCoinAge;
-        if (!vtx[1].GetCoinAge(txdb, nCoinAge))
+        if (!vtx[1].GetCoinAge(txdb, nCoinAge, pindex))
             return error("ConnectBlock() : %s unable to get coin age for coinstake", vtx[1].GetHash().ToString());
 
-        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nFees);
+        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nFees, pindex);
 
-        if (nStakeReward > nCalculatedStakeReward)
+        if (nStakeReward > nCalculatedStakeReward) 
             return DoS(100, error("ConnectBlock() : coinstake pays too much(actual=%d vs calculated=%d)", nStakeReward, nCalculatedStakeReward));
     }
 
@@ -2028,7 +1899,7 @@ bool CBlock::SetBestChain(CTxDB &txdb, CBlockIndex *pindexNew)
 // guaranteed to be in main chain by sync-checkpoint. This rule is
 // introduced to help nodes establish a consistent view of the coin
 // age (trust score) of competing branches.
-bool CTransaction::GetCoinAge(CTxDB &txdb, uint64_t &nCoinAge) const
+bool CTransaction::GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge, CBlockIndex* pindex) const
 {
     CBigNum bnCentSecond = 0; // coin age in the unit of cent-seconds
     nCoinAge = 0;
@@ -2050,7 +1921,7 @@ bool CTransaction::GetCoinAge(CTxDB &txdb, uint64_t &nCoinAge) const
         CBlock block;
         if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
             return false; // unable to read block of previous transaction
-        if (block.GetBlockTime() + GetMinStakeAge() > nTime)
+        if (block.GetBlockTime() + GetMinStakeAge(pindex) > nTime)
             continue; // only count coins meeting min age requirement
 
         int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
@@ -2488,6 +2359,12 @@ bool ProcessBlock(CNode *pfrom, CBlock *pblock)
 
     LogPrintf("ProcessBlock: ACCEPTED\n");
 
+	// If turned on stake4charity, send a portion of stake reward to savings account address
+	if (pwalletMain->fStakeForCharity && (mapBlockIndex[hash]->nHeight >= Params().StabilitySoftFork() || TestNet()))
+		if (!pwalletMain->StakeForCharity())
+			LogPrint("s4c", "ERROR While trying to send portion of stake reward to savings account");
+
+
     // ppcoin: if responsible for sync-checkpoint send it
     if (pfrom && !CSyncCheckpoint::strMasterPrivKey.empty())
         Checkpoints::SendSyncCheckpoint(Checkpoints::AutoSelectSyncCheckpoint());
@@ -2649,10 +2526,8 @@ bool LoadBlockIndex(bool fAllowNew)
 {
     LOCK(cs_main);
 
-    if (TestNet())
-    {
-        nStakeMinAge = 1 * 60 * 60; // test net min age is 1 hour
-        nCoinbaseMaturity = 10;     // test maturity is 10 blocks
+    if (TestNet()) {
+        nCoinbaseMaturity = 10; // test maturity is 10 blocks
     }
 
     //

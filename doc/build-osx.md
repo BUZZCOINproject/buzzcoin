@@ -26,7 +26,7 @@ git clone https://github.com/buzzcoin-project/BUZZ
 3.  Install dependencies from Brew
 
 ```
-brew install boost berkeley-db openssl miniupnpc qrencode
+brew install boost berkeley-db@4 openssl miniupnpc qrencode
 ```
 
 4.  Now you should be able to build buzzcoind:
