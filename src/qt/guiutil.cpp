@@ -476,6 +476,7 @@ void SetBlackThemeQSS(QApplication& app)
                       "QMenu::item:selected { background-color: rgb(48,140,198); }"
                       "QLabel         { color: rgb(120,127,139); }"
                       "QScrollBar     { color: rgb(255,255,255); }"
+                      "QSpinBox      { background: rgb(63,67,72); color: rgb(255,255,255); border-color: rgb(194,194,194); }"
                       "QCheckBox      { color: rgb(120,127,139); }"
                       "QRadioButton   { color: rgb(120,127,139); }"
                       "QTabBar::tab   { color: rgb(120,127,139); border: 1px solid rgb(78,79,83); border-bottom: none; padding: 5px; }"
