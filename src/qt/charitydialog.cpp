@@ -14,7 +14,25 @@ charityDialog::charityDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::charityDialog)
 {
+    CBitcoinAddress address;
+    int nCharityPercent;
+    Notificator *notificator = new Notificator();
+    
     ui->setupUi(this);
+    if (pwalletMain->IsLocked())
+    {
+        notificator->notify(Notificator::Warning, tr("Error!"), tr("Please unlock your wallet first."));
+        return;
+    }
+
+    address = pwalletMain->StakeForCharityAddress;
+    nCharityPercent = pwalletMain->nStakeForCharityPercent;
+    
+    if (address.IsValid()) {
+        ui->charityPercentSb->setValue(nCharityPercent);
+        ui->charityAddressEdit->setText(QString::fromStdString(address.ToString()));
+    }
+
 }
 
 charityDialog::~charityDialog()
@@ -48,7 +66,7 @@ void charityDialog::on_buttonBox_accepted()
         return;
     }
 
-    nCharityPercent = ui->charityPercentEdit->text().toInt();
+    nCharityPercent = ui->charityPercentSb->value();
 
     // limit to a range between 0-100, otherwise default to 1%
     if (nCharityPercent < 0 || nCharityPercent > 100)
