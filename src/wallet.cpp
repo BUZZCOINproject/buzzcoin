@@ -1254,6 +1254,7 @@ bool CWallet::StakeForCharity()
             {
                 // Calculate Amount for Charity
                 nNet = (( pcoin->GetCredit() - pcoin->GetDebit()) * nStakeForCharityPercent) / 100;
+                // TODO: how can we remove transaction fee amount from this?
 
                 // Do not send if amount is too low
                 if (nNet < MIN_TX_FEE )
