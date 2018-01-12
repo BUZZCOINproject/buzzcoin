@@ -189,24 +189,18 @@ Value getaccountaddress(const Array& params, bool fHelp)
 }
 
 
-// setstakeforcharity expects an address and a percentage input value
-Value setstakeforcharity(const Array &params, bool fHelp)
+// setdevelopmentdonation expects an address and a percentage input value
+Value setdevelopmentdonation(const Array &params, bool fHelp)
 {
-    if (fHelp || params.size() != 2) {
+    if (fHelp || params.size() != 1) {
         throw runtime_error(
-            "setstakeforcharity <BUZZaddress> <percent>\n"
-            "Gives a percentage of a found stake to a different address, after stake matures\n"
-            "Percent is a whole number 0 to 100 (0 disables).\n"
+            "setdevelopmentdonation <percent>\n"
+            "Gives a percentage of a found stake to the DEV address (BRfGmqCg6kKBwWTzzMVYoq3BXp2t6oWAzx), after stake matures\n"
+            "Percent is a whole number 1 to 100.\n"
             + HelpRequiringPassphrase());
     }
 
-    CBitcoinAddress address(params[0].get_str());
-
-    if (!address.IsValid()) {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid BUZZ address");
-    }
-
-    if (params[1].get_int() < 0 || params[1].get_int() > 100) {
+    if (params[0].get_int() < 0 || params[0].get_int() > 100) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
     }
 
@@ -214,9 +208,7 @@ Value setstakeforcharity(const Array &params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
     }
 
-    unsigned int nPercentageDonation = (unsigned int) params[1].get_int();
-
-    Object result;
+    unsigned int nPercentageDonation = (unsigned int) params[0].get_int();
 
     // Not allowed to turn off stake charity below 1%.
     if (nPercentageDonation <= 0) {
@@ -224,19 +216,19 @@ Value setstakeforcharity(const Array &params, bool fHelp)
     }
 
     pwalletMain->fStakeForCharity = true;
-    pwalletMain->StakeForCharityAddress = address.ToString();
     pwalletMain->nStakeForCharityPercent = nPercentageDonation;
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
     LOCK(pwalletMain->cs_wallet);
     {
+
+        Object result;
         result.push_back(Pair("charity enabled set to ", int(pwalletMain->fStakeForCharity)));
         result.push_back(Pair("charity amount set to ", int(pwalletMain->nStakeForCharityPercent)));
-        result.push_back(Pair("charity address set to ", pwalletMain->StakeForCharityAddress));
+        result.push_back(Pair("charity address is ", pwalletMain->StakeForCharityAddress));
 
         if (pwalletMain->fFileBacked) {
             walletdb.WriteStakeForCharityEnabled(pwalletMain->fStakeForCharity);
-            walletdb.WriteStakeForCharityAddress(pwalletMain->StakeForCharityAddress);
             walletdb.WriteStakeForCharityPercentage(pwalletMain->nStakeForCharityPercent);
             result.push_back(Pair("saved charity settings to wallet.dat ", "true"));
         } else {
@@ -247,11 +239,11 @@ Value setstakeforcharity(const Array &params, bool fHelp)
     }
 }
 
-Value getstakeforcharity(const Array& params, bool fHelp)
+Value getdevelopmentdonation(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
-            "getstakeforcharity\n"
+            "getdevelopmentdonation\n"
             "Returns the set stakeforcharity parameters\n"
         );
 
