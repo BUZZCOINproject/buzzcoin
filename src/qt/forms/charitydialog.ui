@@ -30,6 +30,9 @@
    </property>
   </widget>
   <widget class="QLineEdit" name="charityAddressEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>100</x>
