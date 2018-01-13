@@ -1377,21 +1377,21 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 
     // 8.3%, 12.1%, 15.3% chance of instant maturation
     if (
-        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000) ||
-        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
+        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
+        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= 20000000000)
     ) {
         if (fDebug)
-            LogPrintf("GetMinStakeAge(): PowerBlock fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
+            LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
       
-        return 0;
+        return 1;
     }
 
     if (TestNet()) {
         return 10 * 60;
     }
 
-    int nMultiplier = fCurrentSupply / 1000000;
+    int nMultiplier = fCurrentSupply / 100000000;
 
     if (fDebug)
         LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
