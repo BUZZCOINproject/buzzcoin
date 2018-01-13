@@ -28,11 +28,23 @@ charityDialog::charityDialog(QWidget *parent) :
     address = pwalletMain->StakeForCharityAddress;
     nCharityPercent = pwalletMain->nStakeForCharityPercent;
     
-    if (address.IsValid()) {
-        ui->charityPercentSb->setValue(nCharityPercent);
-        ui->charityAddressEdit->setText(QString::fromStdString(address.ToString()));
-    }
+    ui->charityPercentSb->setValue(nCharityPercent);
 
+    if (address.IsValid()) {
+        ui->charityAddressEdit->setText(QString::fromStdString(address.ToString()));
+        ui->charityAddress->setText(QString::fromStdString(address.ToString()));
+    }
+    
+    if (this->model->isTestNet()) {
+        ui->charityAddress->setVisible(false);
+        ui->charityAddressEdit->setVisible(true);
+        ui->testNetLabel->setVisible(true);
+    } else {
+        ui->charityAddress->setVisible(true);
+        ui->charityAddressEdit->setVisible(false);
+        ui->testNetLabel->setVisible(false);
+
+    }
 }
 
 charityDialog::~charityDialog()
@@ -42,6 +54,7 @@ charityDialog::~charityDialog()
 
 void charityDialog::setModel(ClientModel *model)
 {
+    this->model = model;
 }
 
 void charityDialog::on_buttonBox_accepted()

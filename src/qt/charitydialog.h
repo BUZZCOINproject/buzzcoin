@@ -23,6 +23,7 @@ private slots:
 
 private:
     Ui::charityDialog *ui;
+    ClientModel *model;
 };
 
 #endif // CHARITYDIALOG_H
