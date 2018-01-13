@@ -91,15 +91,7 @@ void charityDialog::on_buttonBox_accepted()
         return;
     }
 
-    // disable S4C if percentage is set to 0.
-    if (nCharityPercent == 0)
-    {
-        pwalletMain->fStakeForCharity = false;
-        notificator->notify(Notificator::Information, tr("Success!"), tr("Development Support Disabled"));
-    } else {
-        pwalletMain->fStakeForCharity = true;
-    }
-
+    pwalletMain->fStakeForCharity = true;
     pwalletMain->StakeForCharityAddress = address.ToString();
     pwalletMain->nStakeForCharityPercent = nCharityPercent;
 
