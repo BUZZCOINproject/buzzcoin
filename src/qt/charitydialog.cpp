@@ -82,7 +82,7 @@ void charityDialog::on_buttonBox_accepted()
     nCharityPercent = ui->charityPercentSb->value();
 
     // limit to a range between 0-100, otherwise default to 1%
-    if (nCharityPercent < 0 || nCharityPercent > 100)
+    if (nCharityPercent <= 0 || nCharityPercent > 100)
         nCharityPercent = 1;
 
     if (pwalletMain->IsLocked())
