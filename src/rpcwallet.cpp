@@ -1647,7 +1647,8 @@ Value setstakesplitthreshold(const Array& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "setstakesplitthreshold <1 - 25,000,000>\n"
-            "This will set the output size of your stakes to never be below this number\n");
+            "Stakes received lower than your 'stakesplitthreshold' will not split into multiple inputs.\n"
+            "It is advised to keep this number as high as possible, to reduce need for coin control!");
 
     uint64_t nStakeSplitThreshold = boost::lexical_cast<int>(params[0].get_str());
 
