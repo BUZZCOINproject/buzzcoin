@@ -1656,7 +1656,7 @@ Value setstakesplitthreshold(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Unlock wallet to use this feature");
     }
         
-    if (nStakeSplitThreshold > 25000000) {
+    if (nStakeSplitThreshold < 1 || nStakeSplitThreshold > 25000000) {
         return "out of range - setting split threshold failed\n Range 1 - 25,000,000";
     }
 
