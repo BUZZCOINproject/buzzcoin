@@ -200,7 +200,7 @@ Value setdevelopmentdonation(const Array &params, bool fHelp)
             + HelpRequiringPassphrase());
     }
 
-    if (params[0].get_int() < 0 || params[0].get_int() > 100) {
+    if (params[0].get_int() < 0 ||params[0].get_int() > 100) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
     }
 
