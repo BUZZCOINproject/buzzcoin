@@ -298,8 +298,8 @@ static const CRPCCommand vRPCCommands[] =
     { "checkkernel",            &checkkernel,            true,      false,     true },
     { "setstakesplitthreshold", &setstakesplitthreshold, false,     false,     true },
     { "getstakesplitthreshold", &getstakesplitthreshold, false,     false,     true },
-    { "setstakeforcharity",     &setstakeforcharity,     false,     false,     true },
-    { "getstakeforcharity",     &getstakeforcharity,     false,     false,     true },
+    { "setdevelopmentdonation", &setdevelopmentdonation, false,     false,     true },
+    { "getdevelopmentdonation", &getdevelopmentdonation,     false,     false,     true },
 #endif
 };
 

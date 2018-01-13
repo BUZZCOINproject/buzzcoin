@@ -1059,17 +1059,24 @@ int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
             nSubsidy = 33000 * COIN;
         }
     } else {
-        if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
+        if(pindexBest->nHeight == 1) {
+            // original 100,000 legacy BUZZ premine.
+            nSubsidy = 100000 * COIN;
+        }
     }
 
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
 
-    if (t > 1505852400 && fCurrentSupply <= MAX_MONEY) {
-        return nSubsidy;
-    }
+    time_t SOME_RANDOM_LEGACY_FORK = 1505852400;
 
-    if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
-        return MAX_MONEY - fCurrentSupply;
+    if (t > SOME_RANDOM_LEGACY_FORK) {
+        if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
+            return MAX_MONEY - fCurrentSupply;
+        }
+
+        if (fCurrentSupply <= MAX_MONEY) {
+            return nSubsidy;
+        }
     }
     
     if (fCurrentSupply >= MAX_MONEY) {
@@ -1626,7 +1633,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 
         int64_t nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nFees, pindex);
 
-        if (nStakeReward > nCalculatedStakeReward) 
+        if (nStakeReward > nCalculatedStakeReward)
             return DoS(100, error("ConnectBlock() : coinstake pays too much(actual=%d vs calculated=%d)", nStakeReward, nCalculatedStakeReward));
     }
 

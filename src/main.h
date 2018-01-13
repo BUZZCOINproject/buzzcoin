@@ -1338,7 +1338,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     if (
         (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
         (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= 20000000000)
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
     ) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
@@ -1347,7 +1347,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     }
 
     // no reward after 20b
-    if (fCurrentSupply >= 20000000) {
+    if (fCurrentSupply >= MAX_MONEY) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
       
@@ -1368,7 +1368,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     int nCurrentHeight = pindex->nHeight;
 
     // if not yet reaching activation block and we are NOT on test net
-    if (nCurrentHeight < Params().StabilitySoftFork() && !TestNet()) {
+    if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nCurrentHeight, nHours * 60 * 60);
       
@@ -1377,21 +1377,21 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 
     // 8.3%, 12.1%, 15.3% chance of instant maturation
     if (
-        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000) ||
-        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000 && fCurrentSupply <= 15000000) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000 && fCurrentSupply <= 20000000)
+        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
+        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
     ) {
         if (fDebug)
-            LogPrintf("GetMinStakeAge(): PowerBlock fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
+            LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
       
-        return 0;
+        return 1;
     }
 
     if (TestNet()) {
         return 10 * 60;
     }
 
-    int nMultiplier = fCurrentSupply / 1000000;
+    int nMultiplier = fCurrentSupply / 100000000;
 
     if (fDebug)
         LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
@@ -1403,8 +1403,9 @@ inline int64_t GetMaxStakeAge(CBlockIndex* pindex) {
     int nMinStakeAge = GetMinStakeAge(pindex);
     int nMaxStakeAge = nMinStakeAge * 2;
 
-    // disallow stakes longer than 1 month.
-    return nMaxStakeAge >= 30 ? (int64_t)30 : (int64_t)nMaxStakeAge;
+    int64_t limit = 720 * 60 * 60; // 30 day limit
+
+    return nMaxStakeAge >= limit ? limit : (int64_t)nMaxStakeAge;
 }
 
 #endif
