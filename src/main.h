@@ -1403,8 +1403,9 @@ inline int64_t GetMaxStakeAge(CBlockIndex* pindex) {
     int nMinStakeAge = GetMinStakeAge(pindex);
     int nMaxStakeAge = nMinStakeAge * 2;
 
-    // disallow stakes longer than 1 month.
-    return nMaxStakeAge >= 30 ? (int64_t)30 : (int64_t)nMaxStakeAge;
+    int64_t limit = 720 * 60 * 60; // 30 day limit
+
+    return nMaxStakeAge >= limit ? limit : (int64_t)nMaxStakeAge;
 }
 
 #endif
