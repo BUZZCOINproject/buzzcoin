@@ -1338,7 +1338,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     if (
         (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
         (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= 20000000000)
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
     ) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
@@ -1347,7 +1347,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     }
 
     // no reward after 20b
-    if (fCurrentSupply >= 20000000) {
+    if (fCurrentSupply >= MAX_MONEY) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
       
@@ -1379,7 +1379,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     if (
         (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
         (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= 20000000000)
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
     ) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
