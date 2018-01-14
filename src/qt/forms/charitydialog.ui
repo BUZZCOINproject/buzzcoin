@@ -89,7 +89,7 @@
     <number>1</number>
    </property>
    <property name="text">
-    <string>This dialog allows you to donate a percent of your staking rewards to fund development. Donations recieved are only ever used for funding development. Thank you for your contribution!</string>
+    <string>This dialog allows you to donate a percent of your staking rewards to fund development. These funds will be used to pay for costs including: development, infrastructure, project materials, marketing and more. A minimum of 5% is required. Thank you for your contribution!</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
