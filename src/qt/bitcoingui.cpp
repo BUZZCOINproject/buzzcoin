@@ -366,15 +366,15 @@ void BitcoinGUI::createToolBars()
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
 
+    QWidget* header = new QWidget();
+    header->setMinimumSize(160, 188);
+    header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    toolbar->addWidget(header);
+
     if (fUseBlackTheme)
-    {
-        QWidget* header = new QWidget();
-        header->setMinimumSize(160, 188);
-        header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         header->setStyleSheet("QWidget { background-color: rgb(24,26,30); background-repeat: no-repeat; background-image: url(:/images/header); background-position: top center; }");
-        toolbar->addWidget(header);
-        toolbar->addWidget(makeToolBarSpacer());
-    }
+    else
+        header->setStyleSheet("QWidget { background-repeat: no-repeat; background-image: url(:/images/header2); background-position: top center; }");
 
     toolbar->addAction(overviewAction);
     toolbar->addAction(receiveCoinsAction);
