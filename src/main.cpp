@@ -576,7 +576,7 @@ bool CTransaction::CheckTransaction() const
 
 static const int64_t TransactionFeeDivider_V1 = 200; // Giving out 0.005%????
 static const int64_t TransactionFeeDivider_V2 = 25*COIN; // 200 = 0.5%, so 200*2 = 400 = 1% 1%*25 = 25% 
-static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending an input to output by same address to specify transaction fee percentage
+// static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending an input to output by same address to specify transaction fee percentage
 
 /**
  * As a coin technically equals to 1*COIN (due to ~8 decimal places)
@@ -589,7 +589,7 @@ static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending a
 static const time_t PercentageFeeSendingBegin = 1400000000;
 static const time_t PercentageFeeRelayBegin = 1400000000;
 static const time_t ForkTiming = 1454284800;
-static const time_t Fork2 = 1505877351;
+// static const time_t Fork2 = 1505877351;
 static const time_t Fork3 = 1506157251;
 
 //int64_t GetMinSendFee(const int64_t nValue)
