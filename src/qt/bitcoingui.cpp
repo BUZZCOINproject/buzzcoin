@@ -81,7 +81,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     prevBlocks(0),
     nWeight(0)
 {
-    resize(450, 400);
+    resize(800, 660);
     setWindowTitle(tr("BUZZ") + " - " + tr("Wallet"));
 #ifndef Q_OS_MAC
     qApp->setWindowIcon(QIcon(":icons/novacoin"));
@@ -369,7 +369,7 @@ void BitcoinGUI::createToolBars()
     if (fUseBlackTheme)
     {
         QWidget* header = new QWidget();
-        header->setMinimumSize(160, 116);
+        header->setMinimumSize(160, 188);
         header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         header->setStyleSheet("QWidget { background-color: rgb(24,26,30); background-repeat: no-repeat; background-image: url(:/images/header); background-position: top center; }");
         toolbar->addWidget(header);
@@ -406,17 +406,15 @@ void BitcoinGUI::setClientModel(ClientModel *clientModel)
     if(clientModel)
     {
         // Replace some strings and icons, when using the testnet
-        if(clientModel->isTestNet())
-        {
+        if(clientModel->isTestNet()) {
             setWindowTitle(windowTitle() + QString(" ") + tr("[testnet]"));
-#ifndef Q_OS_MAC
+        #ifndef Q_OS_MAC
             qApp->setWindowIcon(QIcon(":icons/novacoin_testnet"));
             setWindowIcon(QIcon(":icons/novacoin_testnet"));
-#else
+        #else
             MacDockIconHandler::instance()->setIcon(QIcon(":icons/novacoin_testnet"));
-#endif
-            if(trayIcon)
-            {
+        #endif
+            if(trayIcon) {
                 trayIcon->setToolTip(tr("BUZZ client") + QString(" ") + tr("[testnet]"));
                 trayIcon->setIcon(QIcon(":/icons/toolbar_testnet"));
                 toggleHideAction->setIcon(QIcon(":/icons/toolbar_testnet"));
