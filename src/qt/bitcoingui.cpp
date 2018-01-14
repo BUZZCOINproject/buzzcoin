@@ -365,6 +365,9 @@ void BitcoinGUI::createToolBars()
     toolbar = new QToolBar(tr("Tabs toolbar"));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
+    
+    // set font style for toolbar
+    toolbar->setStyleSheet("QToolButton { font: 13px; }");
 
     if (fUseBlackTheme)
     {
