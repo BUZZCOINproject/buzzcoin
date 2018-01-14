@@ -81,9 +81,9 @@ void charityDialog::on_buttonBox_accepted()
 
     nCharityPercent = ui->charityPercentSb->value();
 
-    // limit to a range between 0-100, otherwise default to 1%
-    if (nCharityPercent <= 0 || nCharityPercent > 100)
-        nCharityPercent = 1;
+    // limit to a range between 5-100, otherwise default to 5%
+    if (nCharityPercent <= 5 || nCharityPercent > 100)
+        nCharityPercent = 5;
 
     if (pwalletMain->IsLocked())
     {
@@ -101,7 +101,7 @@ void charityDialog::on_buttonBox_accepted()
     {
         if (pwalletMain->fFileBacked)
         {
-            walletdb.WriteStakeForCharityEnabled(nCharityPercent <= 0 ? false : true);
+            walletdb.WriteStakeForCharityEnabled(pwalletMain->fStakeForCharity);
             walletdb.WriteStakeForCharityPercentage(nCharityPercent);
             walletdb.WriteStakeForCharityAddress(address.ToString());
             notificator->notify(Notificator::Information, tr("Success!"), tr("Development Support settings saved to wallet.dat!"));

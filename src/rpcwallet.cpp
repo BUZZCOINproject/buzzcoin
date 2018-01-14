@@ -196,11 +196,11 @@ Value setdevelopmentdonation(const Array &params, bool fHelp)
         throw runtime_error(
             "setdevelopmentdonation <percent>\n"
             "Gives a percentage of a found stake to the DEV address (BRfGmqCg6kKBwWTzzMVYoq3BXp2t6oWAzx), after stake matures\n"
-            "Percent is a whole number 1 to 100.\n"
+            "Percent is a whole number 5 to 100.\n"
             + HelpRequiringPassphrase());
     }
 
-    if (params[0].get_int() < 0 ||params[0].get_int() > 100) {
+    if (params[0].get_int() <= 5 ||params[0].get_int() > 100) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
     }
 
@@ -210,9 +210,9 @@ Value setdevelopmentdonation(const Array &params, bool fHelp)
 
     unsigned int nPercentageDonation = (unsigned int) params[0].get_int();
 
-    // Not allowed to turn off stake charity below 1%.
-    if (nPercentageDonation <= 0) {
-        nPercentageDonation = 1;
+    // Not allowed to set development percentage below 5%.
+    if (nPercentageDonation <= 5 || nPercentageDonation >= 100) {
+        nPercentageDonation = 5;
     }
 
     pwalletMain->fStakeForCharity = true;
