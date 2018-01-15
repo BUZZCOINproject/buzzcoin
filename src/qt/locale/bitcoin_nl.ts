@@ -2758,8 +2758,8 @@ for example: alertnotify=echo %%s | mail -s &quot;BuzzCoin Alert&quot; admin@foo
     </message>
     <message>
         <location line="+6"/>
-        <source>Listen for connections on &lt;port&gt; (default: 15714 or testnet: 25714)</source>
-        <translation>Luister voor verbindingen op &lt;poort&gt; (standaard: 15714 of testnet: 25714)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 25128 or testnet: 25714)</source>
+        <translation>Luister voor verbindingen op &lt;poort&gt; (standaard: 25128 of testnet: 25714)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2808,8 +2808,8 @@ for example: alertnotify=echo %%s | mail -s &quot;BuzzCoin Alert&quot; admin@foo
     </message>
     <message>
         <location line="+64"/>
-        <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 15715 or testnet: 25715)</source>
-        <translation>Wacht op JSON-RPC-connecties op &lt;poort&gt; (standaard: 15715 of testnet: 25715) </translation>
+        <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 25129 or testnet: 20115)</source>
+        <translation>Wacht op JSON-RPC-connecties op &lt;poort&gt; (standaard: 25129 of testnet: 20115) </translation>
     </message>
     <message>
         <location line="-16"/>
