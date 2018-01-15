@@ -192,11 +192,12 @@ Value getaccountaddress(const Array& params, bool fHelp)
 // setdevelopmentdonation expects an address and a percentage input value
 Value setdevelopmentdonation(const Array &params, bool fHelp)
 {
-    if (fHelp || params.size() != 1) {
+    if (fHelp || params.size() == 0) {
         throw runtime_error(
             "setdevelopmentdonation <percent>\n"
             "Gives a percentage of a found stake to the DEV address (BRfGmqCg6kKBwWTzzMVYoq3BXp2t6oWAzx), after stake matures\n"
             "Percent is a whole number 5 to 100.\n"
+            "On testnet, this command accepts a 2nd parameter, address."
             + HelpRequiringPassphrase());
     }
 
@@ -210,8 +211,18 @@ Value setdevelopmentdonation(const Array &params, bool fHelp)
 
     unsigned int nPercentageDonation = (unsigned int) params[0].get_int();
 
+    if (TestNet()) {
+        CBitcoinAddress address(params[1].get_str());
+
+        if (!address.IsValid()) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid BUZZ address");
+        }
+
+        pwalletMain->StakeForCharityAddress = address.ToString();
+    }
+
     // Not allowed to set development percentage below 5%.
-    if (nPercentageDonation <= 5 || nPercentageDonation >= 100) {
+    if (nPercentageDonation <= 5 || nPercentageDonation >= 100) {
         nPercentageDonation = 5;
     }
 
@@ -230,6 +241,7 @@ Value setdevelopmentdonation(const Array &params, bool fHelp)
         if (pwalletMain->fFileBacked) {
             walletdb.WriteStakeForCharityEnabled(pwalletMain->fStakeForCharity);
             walletdb.WriteStakeForCharityPercentage(pwalletMain->nStakeForCharityPercent);
+            walletdb.WriteStakeForCharityAddress(pwalletMain->StakeForCharityAddress);
             result.push_back(Pair("saved charity settings to wallet.dat ", "true"));
         } else {
             result.push_back(Pair("saved charity settings to wallet.dat ", "false"));

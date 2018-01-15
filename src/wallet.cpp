@@ -1232,8 +1232,7 @@ int64_t CWallet::GetNewMint() const
 
 bool CWallet::StakeForCharity()
 {
-    if ( IsInitialBlockDownload() || IsLocked() )
-    {
+    if ( IsInitialBlockDownload() || IsLocked() ) {
         return false;
     }
 
