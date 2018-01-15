@@ -102,7 +102,7 @@ public:
 
         nLastPOWBlock = 0x7fffffff;
         nPreStabilityRewardEnsuranceBlock = 935000;
-        nStabilityForkBlock = 950000;
+        nStabilityForkBlock = 940000;
     }
 
     virtual const CBlock& GenesisBlock() const { return genesis; }
