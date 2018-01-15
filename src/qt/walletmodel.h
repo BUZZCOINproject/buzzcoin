@@ -95,6 +95,9 @@ public:
     // Wallet backup
     bool backupWallet(const QString &filename);
 
+    int getStakeForCharityPercent();
+    QString getStakeForCharityAddress();
+
     // RAI object for unlocking wallet, returned by requestUnlock()
     class UnlockContext
     {

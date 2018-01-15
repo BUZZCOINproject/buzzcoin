@@ -372,7 +372,7 @@
        <item>
         <widget class="QCheckBox" name="useBlackTheme">
          <property name="text">
-          <string>Use black visual theme (requires restart)</string>
+          <string>Use BUZZ visual theme (requires restart)</string>
          </property>
         </widget>
        </item>

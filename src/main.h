@@ -1,7 +1,9 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2017 The BUZZcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef BITCOIN_MAIN_H
 #define BITCOIN_MAIN_H
 
@@ -38,7 +40,7 @@ static const unsigned int MAX_TX_SIGOPS = MAX_BLOCK_SIGOPS/5;
 /** The maximum number of orphan transactions kept in memory */
 static const unsigned int MAX_ORPHAN_TRANSACTIONS = MAX_BLOCK_SIZE/100;
 /** Default for -maxorphanblocks, maximum number of orphan blocks kept in memory */
-static const unsigned int DEFAULT_MAX_ORPHAN_BLOCKS = 750;
+static const unsigned int DEFAULT_MAX_ORPHAN_BLOCKS = 100;
 /** The maximum number of entries in an 'inv' protocol message */
 static const unsigned int MAX_INV_SZ = 50000;
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
@@ -66,7 +68,6 @@ extern CTxMemPool mempool;
 extern std::map<uint256, CBlockIndex*> mapBlockIndex;
 extern std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 extern CBlockIndex* pindexGenesisBlock;
-extern unsigned int nStakeMinAge;
 extern unsigned int nNodeLifespan;
 extern int nCoinbaseMaturity;
 extern int nBestHeight;
@@ -130,8 +131,8 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles);
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
-int64_t GetProofOfWorkReward(int64_t nFees);
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees);
+int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex);
+int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pindex);
 unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime);
 unsigned int ComputeMinStake(unsigned int nBase, int64_t nTime, unsigned int nBlockTime);
 bool IsInitialBlockDownload();
@@ -145,12 +146,6 @@ void ThreadStakeMiner(CWallet *pwallet);
 /** (try to) add transaction to memory pool **/
 bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
                         bool* pfMissingInputs);
-
-
-
-
-
-
 
 /** Position on disk for a particular transaction. */
 class CDiskTxPos
@@ -398,7 +393,7 @@ public:
                        std::map<uint256, CTxIndex>& mapTestPool, const CDiskTxPos& posThisTx,
                        const CBlockIndex* pindexBlock, bool fBlock, bool fMiner, unsigned int flags = STANDARD_SCRIPT_VERIFY_FLAGS);
     bool CheckTransaction() const;
-    bool GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge) const;  // ppcoin: get transaction coin age
+    bool GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge, CBlockIndex* pindex) const;  // ppcoin: get transaction coin age
 
     const CTxOut& GetOutputFor(const CTxIn& input, const MapPrevTx& inputs) const;
 };
@@ -1311,5 +1306,106 @@ protected:
     friend void ::UnregisterWallet(CWalletInterface*);
     friend void ::UnregisterAllWallets();
 };
+
+
+//
+// mechanisms for coin reward and maturation modification
+//
+
+inline double GetCoinSupplyFromAmount(int64_t amount)
+{
+    return (double)amount / (double)COIN;
+}
+
+// returns percentage reward per year
+inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
+    int nCurrentHeight = pindex->nHeight;
+    
+    if (fDebug)
+        LogPrintf("GetCoinYearReward(): currentSupply=%.8f currentHeight=%d\n", fCurrentSupply, nCurrentHeight);
+
+    // if not yet reaching activation block and we are NOT on test net
+    if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
+        if (fDebug)
+            LogPrintf("GetCoinYearReward(): legacy yearReward=1200\n");
+      
+        return 1200 * CENT;
+    }
+
+    // Power Blocks:
+    // The original APR is 8.3%, 12,1%, 15.3% chance of original APR
+    if (
+        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
+        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
+    ) {
+        if (fDebug)
+            LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
+      
+        return 1200 * CENT;
+    }
+
+    // no reward after 20b
+    if (fCurrentSupply >= MAX_MONEY) {
+        if (fDebug)
+            LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
+      
+        return 0 * CENT;
+    }
+
+    if (fDebug)
+        LogPrintf("GetCoinYearReward(): yearReward=%.8f\n", 1200 - (1200 * (fCurrentSupply/MAX_MONEY)));
+
+    return max(1200 - (1200 * (fCurrentSupply/MAX_MONEY)), 2.5) * CENT;
+}
+
+// returns the minimum stake age based on 8 hours of time
+inline int GetMinStakeAge(CBlockIndex* pindex)
+{
+    int nHours = 8;
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
+    int nCurrentHeight = pindex->nHeight;
+
+    // if not yet reaching activation block and we are NOT on test net
+    if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
+        if (fDebug)
+            LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nCurrentHeight, nHours * 60 * 60);
+      
+        return nHours * 60 * 60;
+    }
+
+    // 8.3%, 12.1%, 15.3% chance of instant maturation
+    if (
+        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
+        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
+    ) {
+        if (fDebug)
+            LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
+      
+        return 1;
+    }
+
+    if (TestNet()) {
+        return 10 * 60;
+    }
+
+    int nMultiplier = fCurrentSupply / 100000000;
+
+    if (fDebug)
+        LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
+
+    return (nHours * nMultiplier) * 60 * 60;
+}
+
+inline int64_t GetMaxStakeAge(CBlockIndex* pindex) {
+    int nMinStakeAge = GetMinStakeAge(pindex);
+    int nMaxStakeAge = nMinStakeAge * 2;
+
+    int64_t limit = 720 * 60 * 60; // 30 day limit
+
+    return nMaxStakeAge >= limit ? limit : (int64_t)nMaxStakeAge;
+}
 
 #endif
