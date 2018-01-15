@@ -38,7 +38,6 @@ set<pair<COutPoint, unsigned int> > setStakeSeen;
 CBigNum bnProofOfStakeLimit(~uint256(0) >> 20);
 CBigNum bnProofOfStakeLimitV2(~uint256(0) >> 20);
 
-unsigned int nStakeMinAge = 8 * 60 * 60; // 8 hours
 unsigned int nModifierInterval = 8 * 60; // time to elapse before new modifier is computed
 
 int nCoinbaseMaturity = 188;
@@ -577,7 +576,7 @@ bool CTransaction::CheckTransaction() const
 
 static const int64_t TransactionFeeDivider_V1 = 200; // Giving out 0.005%????
 static const int64_t TransactionFeeDivider_V2 = 25*COIN; // 200 = 0.5%, so 200*2 = 400 = 1% 1%*25 = 25% 
-static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending an input to output by same address to specify transaction fee percentage
+// static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending an input to output by same address to specify transaction fee percentage
 
 /**
  * As a coin technically equals to 1*COIN (due to ~8 decimal places)
@@ -590,7 +589,7 @@ static const int64_t TransactionFeeDividerSelf = 1*COIN; //divider for sending a
 static const time_t PercentageFeeSendingBegin = 1400000000;
 static const time_t PercentageFeeRelayBegin = 1400000000;
 static const time_t ForkTiming = 1454284800;
-static const time_t Fork2 = 1505877351;
+// static const time_t Fork2 = 1505877351;
 static const time_t Fork3 = 1506157251;
 
 //int64_t GetMinSendFee(const int64_t nValue)
@@ -617,7 +616,9 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
         if(t>ForkTiming)
 	{
 		TransactionFeeDivider = TransactionFeeDivider_V2;
-	} else {TransactionFeeDivider = TransactionFeeDivider_V1;}
+	} else {
+        TransactionFeeDivider = TransactionFeeDivider_V1;
+    }
 	
     // Base fee is either nMinTxFee or nMinRelayTxFee
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
@@ -631,11 +632,13 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
     if(t > PercentageFeeRelayBegin || (t > PercentageFeeSendingBegin && mode==GMF_SEND) )  
     {
         int64_t nNewMinFee = 0;
-        int64_t prevNvalue = 0;
     
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
         {
-            bool found=true; //do not add fees when sending to the same address (this can be used for restructuring large single inputs)
+            // do not add fees when sending to the same address
+            // - this can be used for restructuring large single inputs
+            bool found=true; 
+
             BOOST_FOREACH(const CTxIn& txin, tx.vin)
             {
                 if(txin.prevout.hash == txout.GetHash())
@@ -649,9 +652,13 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
             }
             if(!found)
             {
-                // TODO IMPROve
-                if (t > Fork3){nNewMinFee = (txout.nValue / 100000) * 1;} 
-                else {nNewMinFee = (txout.nValue / 100) * 25;}
+                // TODO: IMPROVE
+                if (t > Fork3){
+                    nNewMinFee = (txout.nValue / 100000) * 1;
+                } 
+                else {
+                    nNewMinFee = (txout.nValue / 100) * 25;
+                }
                 
 
             }
@@ -660,19 +667,21 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
 }
         nMinFee += nNewMinFee;
     }
+
     if(nMinFee > COIN*1000000000) // max 1 billion coins fee.
     {
         nMinFee=COIN*1000000000;
     }
 	
-    if (!MoneyRange(nMinFee))
+    if (!MoneyRange(nMinFee)) {
         nMinFee = MAX_MONEY;
+    }
+
     return nMinFee;
 }
 
 
-bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
-                        bool* pfMissingInputs)
+bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree, bool* pfMissingInputs)
 {
     AssertLockHeld(cs_main);
     if (pfMissingInputs)
@@ -1038,30 +1047,64 @@ static CBigNum GetProofOfStakeLimit(int nHeight)
 
 // miner's coin base reward
 time_t t=time(NULL);
-int64_t GetProofOfWorkReward(int64_t nFees)
+int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
 {
     int64_t nSubsidy = 10 * COIN;
-	if(pindexBest->nHeight == 1) { nSubsidy = 100000 * COIN; }
+
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
+
+    if (TestNet()) {
+        // We mine 33K every block up to ~10M
+        if(pindexBest->nHeight <= 300) {
+            nSubsidy = 33000 * COIN;
+        }
+    } else {
+        if(pindexBest->nHeight == 1) {
+            // original 100,000 legacy BUZZ premine.
+            nSubsidy = 100000 * COIN;
+        }
+    }
+
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
 
-    if (t > 1505852400)
-        {return nSubsidy;} 
-    else
-        return nSubsidy + (nFees / 2);
+    time_t SOME_RANDOM_LEGACY_FORK = 1505852400;
+
+    if (t > SOME_RANDOM_LEGACY_FORK) {
+        if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
+            return MAX_MONEY - fCurrentSupply;
+        }
+
+        if (fCurrentSupply <= MAX_MONEY) {
+            return nSubsidy;
+        }
+    }
+    
+    if (fCurrentSupply >= MAX_MONEY) {
+        return 0;
+    }
+
+    return nSubsidy + (nFees / 2);
 }
 
-static const int64_t COIN_YEAR_REWARD = 1200 * CENT; // 1% per year
-// miner's coin stake reward
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
+// stakers's coin stake reward
+int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pindex)
 {
-    int64_t nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 8);
+    int64_t nSubsidy;
+
+    nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + 8);
+
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
+
+    if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
+        nSubsidy = MAX_MONEY - fCurrentSupply;
+    }
 
     LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d\n", FormatMoney(nSubsidy), nCoinAge);
 
     return nSubsidy;
 }
-static const int64_t nTargetTimespan = 120;  // 16 mins
 
+static const int64_t nTargetTimespan = 120; // 16 mins
 //
 // maximum nBits value could possible be required nTime after
 //
@@ -1574,7 +1617,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 
     if (IsProofOfWork())
     {
-        int64_t nReward = GetProofOfWorkReward(nFees);
+        int64_t nReward = GetProofOfWorkReward(nFees, pindex);
         // Check coinbase reward
         if (vtx[0].GetValueOut() > nReward)
             return DoS(50, error("ConnectBlock() : coinbase reward exceeded (actual=%d vs calculated=%d)",
@@ -1585,10 +1628,10 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     {
         // ppcoin: coin stake tx earns reward instead of paying fee
         uint64_t nCoinAge;
-        if (!vtx[1].GetCoinAge(txdb, nCoinAge))
+        if (!vtx[1].GetCoinAge(txdb, nCoinAge, pindex))
             return error("ConnectBlock() : %s unable to get coin age for coinstake", vtx[1].GetHash().ToString());
 
-        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nFees);
+        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nFees, pindex);
 
         if (nStakeReward > nCalculatedStakeReward)
             return DoS(100, error("ConnectBlock() : coinstake pays too much(actual=%d vs calculated=%d)", nStakeReward, nCalculatedStakeReward));
@@ -1596,7 +1639,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 
     // ppcoin: track money supply and mint amount info
     pindex->nMint = nValueOut - nValueIn + nFees;
-    pindex->nMoneySupply = (pindex->pprev? pindex->pprev->nMoneySupply : 0) + nValueOut - nValueIn;
+    pindex->nMoneySupply = (pindex->pprev ? pindex->pprev->nMoneySupply : 0) + nValueOut - nValueIn;
     if (!txdb.WriteBlockIndex(CDiskBlockIndex(pindex)))
         return error("Connect() : WriteBlockIndex for pindex failed");
 
@@ -1879,7 +1922,7 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
 // guaranteed to be in main chain by sync-checkpoint. This rule is
 // introduced to help nodes establish a consistent view of the coin
 // age (trust score) of competing branches.
-bool CTransaction::GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge) const
+bool CTransaction::GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge, CBlockIndex* pindex) const
 {
     CBigNum bnCentSecond = 0;  // coin age in the unit of cent-seconds
     nCoinAge = 0;
@@ -1901,7 +1944,7 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge) const
         CBlock block;
         if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
             return false; // unable to read block of previous transaction
-        if (block.GetBlockTime() + nStakeMinAge > nTime)
+        if (block.GetBlockTime() + GetMinStakeAge(pindex) > nTime)
             continue; // only count coins meeting min age requirement
 
         int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
@@ -2339,6 +2382,12 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
 
     LogPrintf("ProcessBlock: ACCEPTED\n");
 
+	// If turned on stake4charity, send a portion of stake reward to savings account address
+	if (pwalletMain->fStakeForCharity && (mapBlockIndex[hash]->nHeight >= Params().StabilitySoftFork() || TestNet()))
+		if (!pwalletMain->StakeForCharity())
+			LogPrint("s4c", "ERROR While trying to send portion of stake reward to savings account");
+
+
     // ppcoin: if responsible for sync-checkpoint send it
     if (pfrom && !CSyncCheckpoint::strMasterPrivKey.empty())
         Checkpoints::SendSyncCheckpoint(Checkpoints::AutoSelectSyncCheckpoint());
@@ -2493,9 +2542,7 @@ bool LoadBlockIndex(bool fAllowNew)
 {
     LOCK(cs_main);
 
-    if (TestNet())
-    {
-        nStakeMinAge = 1 * 60 * 60; // test net min age is 1 hour
+    if (TestNet()) {
         nCoinbaseMaturity = 10; // test maturity is 10 blocks
     }
 

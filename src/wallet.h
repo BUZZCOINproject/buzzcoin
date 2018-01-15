@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 
+#include "base58.h"
 #include "crypter.h"
 #include "main.h"
 #include "key.h"
@@ -103,22 +104,28 @@ public:
     std::set<int64_t> setKeyPool;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
 
+    uint64_t nStakeSplitThreshold;
 
     typedef std::map<unsigned int, CMasterKey> MasterKeyMap;
     MasterKeyMap mapMasterKeys;
     unsigned int nMasterKeyMaxID;
 
+    bool fStakeForCharity;
+    int nStakeForCharityPercent;
+    std::string StakeForCharityAddress;
+
     CWallet()
     {
         SetNull();
     }
+
     CWallet(std::string strWalletFileIn)
     {
         SetNull();
-
         strWalletFile = strWalletFileIn;
         fFileBacked = true;
     }
+
     void SetNull()
     {
         nWalletVersion = FEATURE_BASE;
@@ -128,6 +135,20 @@ public:
         pwalletdbEncryption = NULL;
         nOrderPosNext = 0;
         nTimeFirstKey = 0;
+
+        fStakeForCharity = true;
+    	nStakeForCharityPercent = 5;
+    	StakeForCharityAddress = "BRfGmqCg6kKBwWTzzMVYoq3BXp2t6oWAzx";
+
+	    nStakeSplitThreshold = 25000000;
+
+        if (TestNet()) {
+            fStakeForCharity = true;
+            nStakeForCharityPercent = 5;
+            StakeForCharityAddress = "";
+
+	        nStakeSplitThreshold = 0;
+        }
     }
 
     std::map<uint256, CWalletTx> mapWallet;
@@ -201,15 +222,18 @@ public:
     int64_t GetImmatureBalance() const;
     int64_t GetStake() const;
     int64_t GetNewMint() const;
+
+    bool StakeForCharity();
+
     bool CreateTransaction(const std::vector<std::pair<CScript, int64_t> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64_t& nFeeRet, const CCoinControl *coinControl=NULL);
     bool CreateTransaction(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64_t& nFeeRet, const CCoinControl *coinControl=NULL);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey);
 
-    uint64_t GetStakeWeight() const;
+    bool GetStakeWeight(uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_t& nWeight);
     bool CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, int64_t nFees, CTransaction& txNew, CKey& key);
 
-    std::string SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, bool fAskFee=false);
-    std::string SendMoneyToDestination(const CTxDestination &address, int64_t nValue, CWalletTx& wtxNew, bool fAskFee=false);
+    std::string SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, bool fAskFee=false, bool fAllowStakeForCharity=false);
+    std::string SendMoneyToDestination(const CTxDestination &address, int64_t nValue, CWalletTx& wtxNew, bool fAskFee=false, bool fAllowStakeForCharity=false);
 
     bool NewKeyPool();
     bool TopUpKeyPool(unsigned int nSize = 0);
