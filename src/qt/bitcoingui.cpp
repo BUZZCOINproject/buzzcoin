@@ -90,14 +90,15 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 {
     resize(800, 660);
     setWindowTitle(tr("BUZZ") + " - " + tr("Wallet"));
-#ifndef Q_OS_MAC
-    qApp->setWindowIcon(QIcon(":icons/novacoin"));
-    setWindowIcon(QIcon(":icons/novacoin"));
-#else
-    //setUnifiedTitleAndToolBarOnMac(true);
-    QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
+    
+    #ifndef Q_OS_MAC
+        qApp->setWindowIcon(QIcon(":icons/novacoin"));
+        setWindowIcon(QIcon(":icons/novacoin"));
+    #else
+        //setUnifiedTitleAndToolBarOnMac(true);
+        QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
+        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    #endif
     // Accept D&D of URIs
     setAcceptDrops(true);
 
