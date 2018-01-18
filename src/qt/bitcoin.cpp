@@ -26,6 +26,7 @@
 #include <QTranslator>
 #include <QSplashScreen>
 #include <QLibraryInfo>
+#include <QSettings>
 
 #if defined(BITCOIN_NEED_QT_PLUGINS) && !defined(_BITCOIN_QT_PLUGINS_INCLUDED)
 #define _BITCOIN_QT_PLUGINS_INCLUDED
@@ -39,8 +40,8 @@ Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 #endif
 
 // Need a global reference for the notifications to find the GUI
-static BitcoinGUI *guiref;
-static QSplashScreen *splashref;
+BitcoinGUI *guiref;
+QSplashScreen *splashref;
 
 static void ThreadSafeMessageBox(const std::string& message, const std::string& caption, unsigned int style)
 {
@@ -288,6 +289,12 @@ int main(int argc, char *argv[])
                 // bitcoin: URIs
                 QObject::connect(paymentServer, SIGNAL(receivedURI(QString)), &window, SLOT(handleURI(QString)));
                 QTimer::singleShot(100, paymentServer, SLOT(uiReady()));
+
+                QSettings settings;
+                if (settings.value("disclaimer/agreed").toBool() != true) {
+                    // Run the user-hook (showDisclaimer) from the application event loop.
+                    QTimer::singleShot(0, &window, SLOT(showDisclaimer()));
+                }
 
                 app.exec();
 
