@@ -374,7 +374,7 @@ void BitcoinGUI::createToolBars()
     toolbar = new QToolBar(tr("Tabs toolbar"));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
-    
+
     // set font style for toolbar
     toolbar->setStyleSheet("QToolButton { font: 13px; }");
 
@@ -416,10 +416,10 @@ void BitcoinGUI::showEvent( QShowEvent *event )
 {
     // call whatever your base class is!
     QMainWindow::showEvent( event );
-    
+
     if( event->spontaneous() )
         return;
-    
+
 }
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
@@ -677,7 +677,7 @@ void BitcoinGUI::message(const QString &title, const QString &message, bool moda
     // if the splash screen is still shown, close it
     if (splashref)
         splashref->close();
-    
+
     QString strTitle = tr("BUZZ") + " - ";
     // Default to information icon
     int nMBoxIcon = QMessageBox::Information;
@@ -1080,6 +1080,10 @@ void BitcoinGUI::updateWeight()
     if (!lockWallet)
         return;
 
+    nMinWeight = 0;
+    nMaxWeight = 0;
+    nWeight = 0;
+
     pwalletMain->GetStakeWeight(nMinWeight, nMaxWeight, nWeight);
 }
 
@@ -1087,7 +1091,7 @@ void BitcoinGUI::updateStakingIcon()
 {
     updateWeight();
 
-    if (nLastCoinStakeSearchInterval && nWeight)
+    if (nLastCoinStakeSearchInterval && nWeight/COIN > 0)
     {
         uint64_t nWeight = this->nWeight;
         uint64_t nNetworkWeight = GetPoSKernelPS();
@@ -1107,7 +1111,9 @@ void BitcoinGUI::updateStakingIcon()
             labelStakingIcon->setToolTip(tr("Not staking because wallet is offline"));
         else if (IsInitialBlockDownload())
             labelStakingIcon->setToolTip(tr("Not staking because wallet is syncing"));
-        else if (!nWeight)
+        else if (nWeight/COIN == 0)
+            labelStakingIcon->setToolTip(tr("You are staking dust"));
+        else if (nWeight/COIN < 0)
             labelStakingIcon->setToolTip(tr("Not staking because you don't have mature coins"));
         else
             labelStakingIcon->setToolTip(tr("Not staking"));
