@@ -14,6 +14,9 @@ object_script.buzzcoin-qt.*
 buzzcoin-qt_plugin_import.cpp
 .vscode
 release/*
+xcshareddata
+project.*
+*.mak
 
 # Windows image file caches
 Thumbs.db
