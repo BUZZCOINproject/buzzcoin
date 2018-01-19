@@ -1321,7 +1321,7 @@ inline double GetCoinSupplyFromAmount(int64_t amount)
 inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
-    
+
     if (fDebug)
         LogPrintf("GetCoinYearReward(): currentSupply=%.8f currentHeight=%d\n", fCurrentSupply, nCurrentHeight);
 
@@ -1329,7 +1329,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): legacy yearReward=1200\n");
-      
+
         return 1200 * CENT;
     }
 
@@ -1342,7 +1342,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     ) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
-      
+
         return 1200 * CENT;
     }
 
@@ -1350,7 +1350,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     if (fCurrentSupply >= MAX_MONEY) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
-      
+
         return 0 * CENT;
     }
 
@@ -1371,7 +1371,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nCurrentHeight, nHours * 60 * 60);
-      
+
         return nHours * 60 * 60;
     }
 
@@ -1383,7 +1383,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     ) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
-      
+
         return 1;
     }
 
