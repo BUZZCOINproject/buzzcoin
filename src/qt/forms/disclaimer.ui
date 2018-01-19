@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>disclaimer</class>
+ <widget class="QDialog" name="disclaimer">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>505</width>
+    <height>329</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>BUZZ Disclaimer</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>10</y>
+     <width>251</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>16</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Disclaimer</string>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>40</y>
+     <width>451</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="lineWidth">
+    <number>1</number>
+   </property>
+   <property name="text">
+    <string>Buzzcoin is an open source token project created for use solely within the BUZZ ecosystem. Token and wallet developers are not responsible for any lost or burned coins for any reasons, including lost private keys, malware, sending to invalid addresses, shutting down of exchanges, or any other scenario which results in lost tokens. To be safe we recommend storing coins only in the official wallet and properly backing up wallet data. Even then, by using BUZZ you acknowledge the inherent risks within the cryptocurrency landscape and understand BUZZ developers cannot be held liable for lost coins.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>190</y>
+     <width>451</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="lineWidth">
+    <number>1</number>
+   </property>
+   <property name="text">
+    <string>If you download the wallet from any sources other than the links provided on the official website, you are responsible for taking your own risks, and we cannot guarantee these are not phishing or scam attempts.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="agreeCb">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>250</y>
+     <width>87</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>I agree</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbAG">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>280</y>
+     <width>150</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Agree</string>
+   </property>
+   <property name="default">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbDNA">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>280</y>
+     <width>150</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Don't Agree</string>
+   </property>
+   <property name="default">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../bitcoin.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>agreeCb</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>disclaimer</receiver>
+   <slot>stateChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>73</x>
+     <y>259</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbAG</sender>
+   <signal>clicked()</signal>
+   <receiver>disclaimer</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>441</x>
+     <y>295</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbDNA</sender>
+   <signal>clicked()</signal>
+   <receiver>disclaimer</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>342</x>
+     <y>295</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

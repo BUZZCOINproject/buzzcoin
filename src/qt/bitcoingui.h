@@ -84,6 +84,7 @@ private:
     QAction *verifyMessageAction;
     QAction *aboutAction;
     QAction *charityAction;
+    QAction *disclaimerAction;
     QAction *receiveCoinsAction;
     QAction *optionsAction;
     QAction *toggleHideAction;
@@ -174,6 +175,12 @@ private slots:
     
     /** Show charity dialog */
     void charityClicked();
+    
+    /** Show disclaimer dialog */
+    void showDisclaimer();
+    
+    void showEvent(QShowEvent *event);
+
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);

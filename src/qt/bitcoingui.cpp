@@ -16,6 +16,7 @@
 #include "optionsdialog.h"
 #include "aboutdialog.h"
 #include "charitydialog.h"
+#include "disclaimer.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
 #include "editaddressdialog.h"
@@ -58,12 +59,14 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QStyle>
+#include <QSplashScreen>
 
 #include <iostream>
 
 extern CWallet* pwalletMain;
 extern int64_t nLastCoinStakeSearchInterval;
 double GetPoSKernelPS();
+extern QSplashScreen *splashref;
 
 BitcoinGUI::BitcoinGUI(QWidget *parent):
     QMainWindow(parent),
@@ -282,6 +285,10 @@ void BitcoinGUI::createActions()
     aboutQtAction->setToolTip(tr("Show information about Qt"));
     aboutQtAction->setMenuRole(QAction::AboutQtRole);
 
+    // disclaimer GUI test
+    disclaimerAction = new QAction(QIcon(":/icons/novacoin"), tr("&BUZZ Disclaimer"), this);
+    disclaimerAction->setToolTip(tr("BUZZ Disclaimer"));
+
     // charity gui
     charityAction = new QAction(QIcon(":/icons/novacoin"), tr("&Support Development"), this);
     charityAction->setToolTip(tr("Enable Development Support"));
@@ -311,6 +318,7 @@ void BitcoinGUI::createActions()
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(charityAction, SIGNAL(triggered()), this, SLOT(charityClicked()));
+    connect(disclaimerAction, SIGNAL(triggered()), this, SLOT(showDisclaimer()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
@@ -348,6 +356,7 @@ void BitcoinGUI::createMenuBar()
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(openRPCConsoleAction);
     help->addSeparator();
+    help->addAction(disclaimerAction);
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
 }
@@ -401,6 +410,16 @@ void BitcoinGUI::createToolBars()
     foreach(QAction *action, toolbar->actions()) {
         toolbar->widgetForAction(action)->setFixedWidth(w);
     }
+}
+
+void BitcoinGUI::showEvent( QShowEvent *event )
+{
+    // call whatever your base class is!
+    QMainWindow::showEvent( event );
+    
+    if( event->spontaneous() )
+        return;
+    
 }
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
@@ -541,6 +560,13 @@ void BitcoinGUI::charityClicked()
     dlg.exec();
 }
 
+void BitcoinGUI::showDisclaimer()
+{
+    disclaimer dlg;
+    dlg.setModel(clientModel);
+    dlg.exec();
+}
+
 void BitcoinGUI::setNumConnections(int count)
 {
     QString icon;
@@ -648,6 +674,10 @@ void BitcoinGUI::setNumBlocks(int count)
 
 void BitcoinGUI::message(const QString &title, const QString &message, bool modal, unsigned int style)
 {
+    // if the splash screen is still shown, close it
+    if (splashref)
+        splashref->close();
+    
     QString strTitle = tr("BUZZ") + " - ";
     // Default to information icon
     int nMBoxIcon = QMessageBox::Information;
