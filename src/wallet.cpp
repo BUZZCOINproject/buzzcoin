@@ -1143,11 +1143,14 @@ void CWallet::AvailableCoinsForStaking(vector<COutput>& vCoins, unsigned int nSp
             if (pcoin->nTime + GetMinStakeAge(pindexBest) > nSpendTime)
                 continue;
 
-            if (pcoin->GetBlocksToMaturity() > 0)
-                continue;
-
             int nDepth = pcoin->GetDepthInMainChain();
             if (nDepth < 1)
+                continue;
+            
+            if (nDepth < nCoinbaseMaturity)
+                continue;
+            
+            if (pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++)
