@@ -84,6 +84,7 @@ private:
     QAction *verifyMessageAction;
     QAction *aboutAction;
     QAction *charityAction;
+    QAction *disclaimerAction;
     QAction *receiveCoinsAction;
     QAction *optionsAction;
     QAction *toggleHideAction;
@@ -105,9 +106,9 @@ private:
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
 
-    uint64_t nMinWeight;
-    uint64_t nMaxWeight;
-    uint64_t nWeight;
+    uint64_t nMinWeight = 0;
+    uint64_t nMaxWeight = 0;
+    uint64_t nWeight = 0;
 
     /** Create the main UI actions. */
     void createActions();
@@ -171,9 +172,15 @@ private slots:
     void optionsClicked();
     /** Show about dialog */
     void aboutClicked();
-    
+
     /** Show charity dialog */
     void charityClicked();
+
+    /** Show disclaimer dialog */
+    void showDisclaimer();
+
+    void showEvent(QShowEvent *event);
+
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);

@@ -1143,11 +1143,14 @@ void CWallet::AvailableCoinsForStaking(vector<COutput>& vCoins, unsigned int nSp
             if (pcoin->nTime + GetMinStakeAge(pindexBest) > nSpendTime)
                 continue;
 
-            if (pcoin->GetBlocksToMaturity() > 0)
-                continue;
-
             int nDepth = pcoin->GetDepthInMainChain();
             if (nDepth < 1)
+                continue;
+
+            if (nDepth < nCoinbaseMaturity)
+                continue;
+
+            if (pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++)
@@ -1272,7 +1275,7 @@ bool CWallet::StakeForCharity()
                     FormatMoney(nNet).c_str(),
                     charityAddress.ToString().c_str()
                 );
-                
+
                 SendMoneyToDestination(charityAddress.Get(), nNet, wtx, false, true);
             }
         }
@@ -1824,6 +1827,10 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, int64_t nValue, CWalletTx&
 
 bool CWallet::GetStakeWeight(uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_t& nWeight)
 {
+    nMinWeight = 0;
+    nMaxWeight = 0;
+    nWeight = 0;
+
     // Choose coins to use
     int64_t nBalance = GetBalance();
 
@@ -1876,7 +1883,7 @@ bool CWallet::GetStakeWeight(uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_
             // Maximum weight was reached
             if (nTimeWeight == GetMaxStakeAge(pindexBest)){
                 nMaxWeight += bnCoinDayWeight.getuint64();
-            }       
+            }
         } else {
             nMinWeight = nWeight;
         }
@@ -1927,7 +1934,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         for (unsigned int n=0; n<min(nSearchInterval,(int64_t)nMaxStakeSearchInterval) && !fKernelFound && pindexPrev == pindexBest; n++)
         {
             boost::this_thread::interruption_point();
-            // Search backward in time from the given txNew timestamp 
+            // Search backward in time from the given txNew timestamp
             // Search nSearchInterval seconds back up to nMaxStakeSearchInterval
             COutPoint prevoutStake = COutPoint(pcoin.first->GetHash(), pcoin.second);
             int64_t nBlockTime;
@@ -1998,7 +2005,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 if (fDebug && GetBoolArg("-printcoinstake",!fDebug)) {
                     printf("CreateCoinStake : added kernel type=%d\n", whichType);
                 }
-                
+
                 fKernelFound = true;
                 break;
             }
@@ -2146,7 +2153,7 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNe
         LogPrintf("SendMoney() : %s", strError);
         return strError;
     }
-    
+
     // StakeForCharity is the only allowable option to send coins when the fAllowStakeForCharity flag is set.
     if (fWalletUnlockStakingOnly && !fAllowStakeForCharity)
     {

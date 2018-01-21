@@ -16,6 +16,7 @@
 #include "optionsdialog.h"
 #include "aboutdialog.h"
 #include "charitydialog.h"
+#include "disclaimer.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
 #include "editaddressdialog.h"
@@ -58,12 +59,14 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QStyle>
+#include <QSplashScreen>
 
 #include <iostream>
 
 extern CWallet* pwalletMain;
 extern int64_t nLastCoinStakeSearchInterval;
 double GetPoSKernelPS();
+extern QSplashScreen *splashref;
 
 BitcoinGUI::BitcoinGUI(QWidget *parent):
     QMainWindow(parent),
@@ -282,6 +285,10 @@ void BitcoinGUI::createActions()
     aboutQtAction->setToolTip(tr("Show information about Qt"));
     aboutQtAction->setMenuRole(QAction::AboutQtRole);
 
+    // disclaimer GUI test
+    disclaimerAction = new QAction(QIcon(":/icons/novacoin"), tr("&BUZZ Disclaimer"), this);
+    disclaimerAction->setToolTip(tr("BUZZ Disclaimer"));
+
     // charity gui
     charityAction = new QAction(QIcon(":/icons/novacoin"), tr("&Support Development"), this);
     charityAction->setToolTip(tr("Enable Development Support"));
@@ -311,6 +318,7 @@ void BitcoinGUI::createActions()
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(charityAction, SIGNAL(triggered()), this, SLOT(charityClicked()));
+    connect(disclaimerAction, SIGNAL(triggered()), this, SLOT(showDisclaimer()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
@@ -348,6 +356,7 @@ void BitcoinGUI::createMenuBar()
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(openRPCConsoleAction);
     help->addSeparator();
+    help->addAction(disclaimerAction);
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
 }
@@ -365,7 +374,7 @@ void BitcoinGUI::createToolBars()
     toolbar = new QToolBar(tr("Tabs toolbar"));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
-    
+
     // set font style for toolbar
     toolbar->setStyleSheet("QToolButton { font: 13px; }");
 
@@ -401,6 +410,16 @@ void BitcoinGUI::createToolBars()
     foreach(QAction *action, toolbar->actions()) {
         toolbar->widgetForAction(action)->setFixedWidth(w);
     }
+}
+
+void BitcoinGUI::showEvent( QShowEvent *event )
+{
+    // call whatever your base class is!
+    QMainWindow::showEvent( event );
+
+    if( event->spontaneous() )
+        return;
+
 }
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
@@ -541,6 +560,13 @@ void BitcoinGUI::charityClicked()
     dlg.exec();
 }
 
+void BitcoinGUI::showDisclaimer()
+{
+    disclaimer dlg;
+    dlg.setModel(clientModel);
+    dlg.exec();
+}
+
 void BitcoinGUI::setNumConnections(int count)
 {
     QString icon;
@@ -648,6 +674,10 @@ void BitcoinGUI::setNumBlocks(int count)
 
 void BitcoinGUI::message(const QString &title, const QString &message, bool modal, unsigned int style)
 {
+    // if the splash screen is still shown, close it
+    if (splashref)
+        splashref->close();
+
     QString strTitle = tr("BUZZ") + " - ";
     // Default to information icon
     int nMBoxIcon = QMessageBox::Information;
@@ -1050,6 +1080,10 @@ void BitcoinGUI::updateWeight()
     if (!lockWallet)
         return;
 
+    nMinWeight = 0;
+    nMaxWeight = 0;
+    nWeight = 0;
+
     pwalletMain->GetStakeWeight(nMinWeight, nMaxWeight, nWeight);
 }
 
@@ -1057,35 +1091,16 @@ void BitcoinGUI::updateStakingIcon()
 {
     updateWeight();
 
-    if (nLastCoinStakeSearchInterval && nWeight)
+    if (nLastCoinStakeSearchInterval && nWeight/COIN > 0)
     {
         uint64_t nWeight = this->nWeight;
         uint64_t nNetworkWeight = GetPoSKernelPS();
-        unsigned nEstimateTime = GetTargetSpacing(nBestHeight) * nNetworkWeight / nWeight;
-
-        QString text;
-        if (nEstimateTime < 60)
-        {
-            text = tr("%n second(s)", "", nEstimateTime);
-        }
-        else if (nEstimateTime < 60*60)
-        {
-            text = tr("%n minute(s)", "", nEstimateTime/60);
-        }
-        else if (nEstimateTime < 24*60*60)
-        {
-            text = tr("%n hour(s)", "", nEstimateTime/(60*60));
-        }
-        else
-        {
-            text = tr("%n day(s)", "", nEstimateTime/(60*60*24));
-        }
 
         nWeight /= COIN;
         nNetworkWeight /= COIN;
 
         labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_on" : ":/icons/staking_on").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
-        labelStakingIcon->setToolTip(tr("Staking.<br>Your weight is %1<br>Network weight is %2<br>Expected time to earn reward is %3").arg(nWeight).arg(nNetworkWeight).arg(text));
+        labelStakingIcon->setToolTip(tr("Staking.<br>Your weight is %1<br>Network weight is %2").arg(nWeight).arg(nNetworkWeight));
     }
     else
     {
@@ -1096,6 +1111,8 @@ void BitcoinGUI::updateStakingIcon()
             labelStakingIcon->setToolTip(tr("Not staking because wallet is offline"));
         else if (IsInitialBlockDownload())
             labelStakingIcon->setToolTip(tr("Not staking because wallet is syncing"));
+        else if (nWeight/COIN == 0)
+            labelStakingIcon->setToolTip(tr("You are staking dust"));
         else if (!nWeight)
             labelStakingIcon->setToolTip(tr("Not staking because you don't have mature coins"));
         else

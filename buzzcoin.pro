@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = buzzcoin-qt
-VERSION = 1.2.0.0
+VERSION = 3.0.0.0
 INCLUDEPATH += src src/json src/qt
 QT += network
 DEFINES += ENABLE_WALLET
@@ -195,6 +195,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/signverifymessagedialog.h \
     src/qt/aboutdialog.h \
     src/qt/charitydialog.h \
+    src/qt/disclaimer.h \
     src/qt/editaddressdialog.h \
     src/qt/bitcoinaddressvalidator.h \
     src/alert.h \
@@ -285,6 +286,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/signverifymessagedialog.cpp \
     src/qt/aboutdialog.cpp \
     src/qt/charitydialog.cpp \
+    src/qt/disclaimer.cpp \
     src/qt/editaddressdialog.cpp \
     src/qt/bitcoinaddressvalidator.cpp \
     src/alert.cpp \
@@ -356,6 +358,7 @@ RESOURCES += \
     src/qt/bitcoin.qrc
 
 FORMS += \
+    src/qt/forms/disclaimer.ui \
     src/qt/forms/coincontroldialog.ui \
     src/qt/forms/sendcoinsdialog.ui \
     src/qt/forms/addressbookpage.ui \
