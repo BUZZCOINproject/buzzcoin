@@ -1091,8 +1091,7 @@ void BitcoinGUI::updateStakingIcon()
 {
     updateWeight();
 
-    if (nLastCoinStakeSearchInterval && nWeight/COIN > 0)
-    {
+    if (nLastCoinStakeSearchInterval && nWeight/COIN > 0) {
         uint64_t nWeight = this->nWeight;
         uint64_t nNetworkWeight = GetPoSKernelPS();
 
@@ -1101,20 +1100,20 @@ void BitcoinGUI::updateStakingIcon()
 
         labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_on" : ":/icons/staking_on").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
         labelStakingIcon->setToolTip(tr("Staking.<br>Your weight is %1<br>Network weight is %2").arg(nWeight).arg(nNetworkWeight));
-    }
-    else
-    {
+    } else {
         labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_off" : ":/icons/staking_off").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
-        if (pwalletMain && pwalletMain->IsLocked())
+        
+        if (pwalletMain && pwalletMain->IsLocked()) {
             labelStakingIcon->setToolTip(tr("Not staking because wallet is locked"));
-        else if (vNodes.empty())
+        } else if (vNodes.empty()) {
             labelStakingIcon->setToolTip(tr("Not staking because wallet is offline"));
-        else if (IsInitialBlockDownload())
+        } else if (IsInitialBlockDownload()) {
             labelStakingIcon->setToolTip(tr("Not staking because wallet is syncing"));
-        else if (nWeight/COIN == 0 || !nWeight)
+        } else if (nWeight/COIN == 0 || !nWeight) {
             labelStakingIcon->setToolTip(tr("Not staking because you don't have mature coins"));
-        else
+        } else {
             labelStakingIcon->setToolTip(tr("Not staking"));
+        }
     }
 }
 
