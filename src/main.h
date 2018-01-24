@@ -1387,15 +1387,18 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
         return 1;
     }
 
-    int nMultiplier = fCurrentSupply / ONE_BILLION;
+    int nMultiplier = fCurrentSupply / HUNDRED_MILLION;
+
+    if (nCurrentHeight > Params().ThreeOhFix() && !TestNet()) {
+        nMultiplier = fCurrentSupply / ONE_BILLION;
+    }
 
     if (fDebug)
         LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
 
     if (TestNet()) {
-
-    if (fDebug)
-        LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d TESTNET \n", fCurrentSupply, (nHours * nMultiplier) * 60);
+        if (fDebug)
+            LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d TESTNET \n", fCurrentSupply, (nHours * nMultiplier) * 60);
 
         return (nHours * nMultiplier) * 60; // return minutes
     }

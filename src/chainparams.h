@@ -70,6 +70,7 @@ public:
     int LastPOWBlock() const { return nLastPOWBlock; }
     int PreStabilityRewardEnsuranceBlock() const { return nPreStabilityRewardEnsuranceBlock; }
     int StabilitySoftFork() const { return nStabilityForkBlock; }
+    int ThreeOhFix() const { return nThreeOhFix; }
 protected:
     CChainParams() {};
 
@@ -87,6 +88,7 @@ protected:
     int nLastPOWBlock;
     int nStabilityForkBlock;
     int nPreStabilityRewardEnsuranceBlock;
+    int nThreeOhFix;
 };
 
 /**
