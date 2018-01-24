@@ -37,6 +37,8 @@ static const int64_t CENT = 1000000;
 #define MINING_REWARD 10.0
 
 #define ONE_BILLION 1000000000
+#define TEN_BILLION 10 * ONE_BILLION
+#define FIFTEEN_BILLION 15 * ONE_BILLION
 #define TWENTY_BILLION 20 * ONE_BILLION
 
 #define BEGIN(a)            ((char*)&(a))

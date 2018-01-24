@@ -1336,9 +1336,9 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     // Power Blocks:
     // The original APR is 8.3%, 12,1%, 15.3% chance of original APR
     if (
-        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
-        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
+        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION) ||
+        (nCurrentHeight % 820 == 0 && fCurrentSupply >= TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
     ) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
@@ -1347,7 +1347,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     }
 
     // no reward after 20b
-    if (fCurrentSupply >= MAX_MONEY) {
+    if (fCurrentSupply >= TWENTY_BILLION) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
 
@@ -1355,9 +1355,9 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     }
 
     if (fDebug)
-        LogPrintf("GetCoinYearReward(): yearReward=%.8f\n", 1200 - (1200 * (fCurrentSupply/MAX_MONEY)));
+        LogPrintf("GetCoinYearReward(): yearReward=%.8f\n", 1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)));
 
-    return max(1200 - (1200 * (fCurrentSupply/MAX_MONEY)), 2.5) * CENT;
+    return max(1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)), 2.5) * CENT;
 }
 
 // returns the minimum stake age based on 8 hours of time
