@@ -1391,7 +1391,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
         return 10 * 60;
     }
 
-    int nMultiplier = fCurrentSupply / 100000000;
+    int nMultiplier = fCurrentSupply / ONE_BILLION;
 
     if (fDebug)
         LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
