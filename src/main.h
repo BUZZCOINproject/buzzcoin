@@ -1377,9 +1377,9 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
 
     // 8.3%, 12.1%, 15.3% chance of instant maturation
     if (
-        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
-        (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
+        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION) ||
+        (nCurrentHeight % 820 == 0 && fCurrentSupply >= TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
+        (nCurrentHeight % 650 == 0 && fCurrentSupply >= FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
     ) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
@@ -1387,16 +1387,23 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
         return 1;
     }
 
-    if (TestNet()) {
-        return 10 * 60;
-    }
-
     int nMultiplier = fCurrentSupply / ONE_BILLION;
 
     if (fDebug)
         LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
 
-    return (nHours * nMultiplier) * 60 * 60;
+    if (TestNet()) {
+
+    if (fDebug)
+        LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d TESTNET \n", fCurrentSupply, (nHours * nMultiplier) * 60);
+
+        return (nHours * nMultiplier) * 60; // return minutes
+    }
+
+    if (fDebug)
+        LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d MAINNET \n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
+
+    return (nHours * nMultiplier) * 60 * 60; // return hours
 }
 
 inline int64_t GetMaxStakeAge(CBlockIndex* pindex) {
