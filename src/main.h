@@ -1333,17 +1333,33 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
         return 1200 * CENT;
     }
 
-    // Power Blocks:
-    // The original APR is 8.3%, 12,1%, 15.3% chance of original APR
-    if (
-        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION) ||
-        (nCurrentHeight % 820 == 0 && fCurrentSupply >= TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
-    ) {
-        if (fDebug)
-            LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
+    // 8.3%, 12.1%, 15.3% chance of original 1200% reward.
+    // first "if block" is between Stability Fork and less than the ThreeOhFix block
+    if (nCurrentHeight < Params().ThreeOhFix() && !TestNet()) {
+        // these values are not based correctly due to everything being multiplied by
+        // satoshi values except fCurrentSupply is a double, non satoshid.
+        if (
+            (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
+            (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
+            (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
+        ) {
+            if (fDebug)
+                LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
 
-        return 1200 * CENT;
+            return 1200 * CENT;
+        }
+    } else if (nCurrentHeight >= Params().ThreeOhFix() && !TestNet()) {
+        // The original APR is 8.3%, 12,1%, 15.3% chance of original APR
+        if (
+            (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION) ||
+            (nCurrentHeight % 820 == 0 && fCurrentSupply >= TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
+            (nCurrentHeight % 650 == 0 && fCurrentSupply >= FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
+        ) {
+            if (fDebug)
+                LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
+
+            return 1200 * CENT;
+        }
     }
 
     // no reward after 20b
@@ -1354,10 +1370,20 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
         return 0 * CENT;
     }
 
-    if (fDebug)
-        LogPrintf("GetCoinYearReward(): yearReward=%.8f\n", 1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)));
+    // sorry for the ugliness! after the 940k fork we were multiplying it incorrectly by 100m
+    // this block ensures that for the reward is properly divided.
+    // first "if block" is between Stability Fork and less than the ThreeOhFix block
+    if (nCurrentHeight < Params().ThreeOhFix() && !TestNet()) {
+        if (fDebug)
+            LogPrintf("GetCoinYearReward(): yearReward=%.8f\n broken after stability fork, before threeohfix", 1200 - (1200 * (fCurrentSupply/MAX_MONEY)));
 
-    return max(1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)), 2.5) * CENT;
+        return max(1200 - (1200 * (fCurrentSupply/MAX_MONEY)), 2.5) * CENT;
+    } else if (nCurrentHeight >= Params().ThreeOhFix() && !TestNet()) {
+        if (fDebug)
+            LogPrintf("GetCoinYearReward(): yearReward=%.8f\n threeohfix", 1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)));
+        
+        return max(1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)), 2.5) * CENT;
+    }
 }
 
 // returns the minimum stake age based on 8 hours of time
@@ -1368,6 +1394,7 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
     int nCurrentHeight = pindex->nHeight;
 
     // if not yet reaching activation block and we are NOT on test net
+    // this will return the original maturation time of 8 hours.
     if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f nCurrentHeight=%d minStakeAge=%d\n", fCurrentSupply, nCurrentHeight, nHours * 60 * 60);
@@ -1375,27 +1402,50 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
         return nHours * 60 * 60;
     }
 
-    // 8.3%, 12.1%, 15.3% chance of instant maturation
-    if (
-        (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION) ||
-        (nCurrentHeight % 820 == 0 && fCurrentSupply >= TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
-        (nCurrentHeight % 650 == 0 && fCurrentSupply >= FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
-    ) {
-        if (fDebug)
-            LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
 
-        return 1;
+    // 8.3%, 12.1%, 15.3% chance of instant maturation
+    // first "if block" is between Stability Fork and less than the ThreeOhFix block
+    if (nCurrentHeight < Params().ThreeOhFix() && !TestNet()) {
+        // these values are not based correctly due to everything being multiplied by
+        // satoshi values except fCurrentSupply is a double, non satoshid.
+        if (
+            (nCurrentHeight % 1200 == 0 && fCurrentSupply <= 10000000000) ||
+            (nCurrentHeight % 820 == 0 && fCurrentSupply >= 10000000000 && fCurrentSupply <= 15000000000) ||
+            (nCurrentHeight % 650 == 0 && fCurrentSupply >= 15000000000 && fCurrentSupply <= MAX_MONEY)
+        ) {
+            if (fDebug)
+                LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
+
+            return 1;
+        }
+    } else if (nCurrentHeight >= Params().ThreeOhFix() && !TestNet()) {
+        // using CORRECT non satoshi value comparisions after ThreeOhFix block.
+        if (
+            (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION) ||
+            (nCurrentHeight % 820 == 0 && fCurrentSupply >= TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
+            (nCurrentHeight % 650 == 0 && fCurrentSupply >= FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
+        ) {
+            if (fDebug)
+                LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
+
+            return 1;
+        }
     }
 
-    int nMultiplier = fCurrentSupply / HUNDRED_MILLION;
+    int nMultiplier;
 
-    if (nCurrentHeight > Params().ThreeOhFix() && !TestNet()) {
+    // sorry for the ugliness! after the 940k fork we were multiplying it incorrectly by 100m
+    // this block ensures that for the time between we are doing by 100m and then afterwards
+    // correctly by 1 billion.
+    // first "if block" is between Stability Fork and less than the ThreeOhFix block
+    if (nCurrentHeight < Params().ThreeOhFix() && !TestNet()) {
+        nMultiplier = fCurrentSupply / HUNDRED_MILLION;
+    } else if (nCurrentHeight >= Params().ThreeOhFix() && !TestNet()) {
         nMultiplier = fCurrentSupply / ONE_BILLION;
     }
 
-    if (fDebug)
-        LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d\n", fCurrentSupply, (nHours * nMultiplier) * 60 * 60);
-
+    // while on testnet, we would like to keep it in minutes instead of hours
+    // for easier testing.
     if (TestNet()) {
         if (fDebug)
             LogPrintf("GetMinStakeAge(): fCurrentSupply=%.8f minStakeAge=%d TESTNET \n", fCurrentSupply, (nHours * nMultiplier) * 60);
