@@ -34,7 +34,10 @@ class uint256;
 static const int64_t COIN = 100000000;
 static const int64_t CENT = 1000000;
 
+#define MINING_REWARD 10.0
+
 #define ONE_BILLION 1000000000
+#define TWENTY_BILLION 20 * ONE_BILLION
 
 #define BEGIN(a)            ((char*)&(a))
 #define END(a)              ((char*)&((&(a))[1]))

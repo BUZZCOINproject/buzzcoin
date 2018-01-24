@@ -1070,16 +1070,16 @@ int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
     time_t SOME_RANDOM_LEGACY_FORK = 1505852400;
 
     if (t > SOME_RANDOM_LEGACY_FORK) {
-        if (nSubsidy + fCurrentSupply >= MAX_MONEY) {
-            return MAX_MONEY - fCurrentSupply;
+        if (MINING_REWARD + fCurrentSupply >= TWENTY_BILLION) {
+            return (TWENTY_BILLION - fCurrentSupply) * COIN;
         }
 
-        if (fCurrentSupply <= MAX_MONEY) {
+        if (fCurrentSupply <= TWENTY_BILLION) {
             return nSubsidy;
         }
     }
-    
-    if (fCurrentSupply >= MAX_MONEY) {
+
+    if (fCurrentSupply >= TWENTY_BILLION) {
         return 0;
     }
 
