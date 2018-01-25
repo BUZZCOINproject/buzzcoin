@@ -1428,8 +1428,8 @@ inline int GetMinStakeAge(CBlockIndex* pindex)
         // using CORRECT non satoshi value comparisions after ThreeOhFix block.
         if (
             (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION) ||
-            (nCurrentHeight % 820 == 0 && fCurrentSupply >= TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
-            (nCurrentHeight % 650 == 0 && fCurrentSupply >= FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
+            (nCurrentHeight % 820 == 0 && fCurrentSupply > TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
+            (nCurrentHeight % 650 == 0 && fCurrentSupply > FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
         ) {
             if (fDebug)
                 LogPrintf("GetMinStakeAge(): Instant Maturation! fCurrentSupply=%.8f minStakeAge=0\n", fCurrentSupply);
