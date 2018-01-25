@@ -1055,12 +1055,12 @@ int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
 
     if (TestNet()) {
         // We mine 33K every block up to ~10M
-        if(pindexBest->nHeight <= 7) {
+        if(pindexBest->nHeight <= 300) {
             if (fDebug) {
                 LogPrintf("GetProofOfWorkReward(): ONE_BILLION premine at block %d.", pindexBest->nHeight);
             }
 
-            nSubsidy = ONE_BILLION * COIN;
+            nSubsidy = 33000 * COIN;
         }
     } else {
         if(pindexBest->nHeight == 1) {
