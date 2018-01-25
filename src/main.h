@@ -48,7 +48,7 @@ static const int64_t MIN_TX_FEE = 1000;
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying) */
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
 /** No amount larger than this (in satoshi) is valid */
-static const int64_t MAX_MONEY = 20000000000 * COIN; // 20 Billion coins
+static const int64_t MAX_MONEY = TWENTY_BILLION * COIN; // 20 Billion coins
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
@@ -1325,6 +1325,14 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     if (fDebug)
         LogPrintf("GetCoinYearReward(): currentSupply=%.8f currentHeight=%d\n", fCurrentSupply, nCurrentHeight);
 
+    // no reward after 20b
+    if (fCurrentSupply >= TWENTY_BILLION) {
+        if (fDebug)
+            LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
+        
+        return 0 * CENT;
+    }
+
     // if not yet reaching activation block and we are NOT on test net
     if (nCurrentHeight <= Params().StabilitySoftFork() && !TestNet()) {
         if (fDebug)
@@ -1351,9 +1359,9 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     } else if (nCurrentHeight >= Params().ThreeOhFix() && !TestNet()) {
         // The original APR is 8.3%, 12,1%, 15.3% chance of original APR
         if (
-            (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION) ||
-            (nCurrentHeight % 820 == 0 && fCurrentSupply >= TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION) ||
-            (nCurrentHeight % 650 == 0 && fCurrentSupply >= FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION)
+            (nCurrentHeight % 1200 == 0 && fCurrentSupply <= TEN_BILLION ) ||
+            (nCurrentHeight % 820 == 0 && fCurrentSupply > TEN_BILLION && fCurrentSupply <= FIFTEEN_BILLION ) ||
+            (nCurrentHeight % 650 == 0 && fCurrentSupply > FIFTEEN_BILLION && fCurrentSupply <= TWENTY_BILLION )
         ) {
             if (fDebug)
                 LogPrintf("GetCoinYearReward(): PowerBlock nCurrentHeight=%d yearReward=1200\n", nCurrentHeight);
@@ -1362,28 +1370,26 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
         }
     }
 
-    // no reward after 20b
-    if (fCurrentSupply >= TWENTY_BILLION) {
-        if (fDebug)
-            LogPrintf("GetCoinYearReward(): Staking reward disabled.\n");
-
-        return 0 * CENT;
-    }
-
     // sorry for the ugliness! after the 940k fork we were multiplying it incorrectly by 100m
     // this block ensures that for the reward is properly divided.
     // first "if block" is between Stability Fork and less than the ThreeOhFix block
     if (nCurrentHeight < Params().ThreeOhFix() && !TestNet()) {
+        
         if (fDebug)
             LogPrintf("GetCoinYearReward(): yearReward=%.8f\n broken after stability fork, before threeohfix", 1200 - (1200 * (fCurrentSupply/MAX_MONEY)));
 
         return max(1200 - (1200 * (fCurrentSupply/MAX_MONEY)), 2.5) * CENT;
+        
     } else if (nCurrentHeight >= Params().ThreeOhFix() && !TestNet()) {
+        
         if (fDebug)
             LogPrintf("GetCoinYearReward(): yearReward=%.8f\n threeohfix", 1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)));
         
         return max(1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)), 2.5) * CENT;
     }
+    
+    // default reward if nothing matches
+    return 0 * CENT;
 }
 
 // returns the minimum stake age based on 8 hours of time

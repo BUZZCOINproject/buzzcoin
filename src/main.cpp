@@ -662,15 +662,15 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize, enum GetMinFe
                 
 
             }
-            if (t > Fork3){nNewMinFee = (txout.nValue /100000) * 1;}
+            if (t > Fork3){nNewMinFee = (txout.nValue / 100000) * 1;}
             else {nNewMinFee = (txout.nValue / 100) * 25;}
 }
         nMinFee += nNewMinFee;
     }
 
-    if(nMinFee > COIN*1000000000) // max 1 billion coins fee.
+    if( nMinFee > COIN * ONE_BILLION ) // max 1 billion coins fee.
     {
-        nMinFee=COIN*1000000000;
+        nMinFee = COIN * ONE_BILLION;
     }
 	
     if (!MoneyRange(nMinFee)) {
@@ -1091,6 +1091,14 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pind
 {
     int64_t nSubsidy;
 
+    // So basically, we're getting the number of coin per year, divided by the number
+    // of days in a year, multiplied by the coin age (in days) of the stake (prorata).
+    // If the end of the formula looks weird to you, it's because there isn't exactly
+    // 365 days in a year - that would be forgetting the leap years ...
+    // So there's actually 365.2421 days.
+    // "( 365 * 33 + 8 ) / 33" is approximatively 0.2424. "* 33 / ( 365 * 33 + 8 )"
+    // is a way to take this in account without risking losing precision
+    // (ie. without using floats).
     nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + 8);
 
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
@@ -2987,8 +2995,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         uint64_t nNonce = 1;
         vRecv >> pfrom->nVersion >> pfrom->nServices >> nTime >> addrMe;
         if (
-            pfrom->nVersion < MIN_PEER_PROTO_VERSION ||
-            (nBestHeight >= Params().StabilitySoftFork() && pfrom->nVersion < MIN_PEER_PROTO_VERSION_V3)
+            pfrom->nVersion < MIN_PEER_PROTO_VERSION
+            || ( nBestHeight >= Params().StabilitySoftFork() && pfrom->nVersion < MIN_PEER_PROTO_VERSION_V3 )
+            || ( nBestHeight >= Params().ThreeOhFix() && pfrom->nVersion < MIN_PEER_PROTO_VERSION_V3_1 )
             )
         {
             // disconnect from peers older than this proto version
