@@ -1072,7 +1072,7 @@ int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
     // if we are equal to or over 20b, we return no subsidy.
     if (fCurrentSupply >= TWENTY_BILLION) {
         if (fDebug) {
-            LogPrint("GetProofOfWorkReward(): currentSupply=%.8f, returning 0 mining subsidy.");
+            LogPrintf("GetProofOfWorkReward(): currentSupply=%.8f, returning 0 mining subsidy.", fCurrentSupply);
         }
         return 0;
     }
