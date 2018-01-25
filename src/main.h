@@ -1393,6 +1393,9 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
         
         return max(1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)), 2.5) * CENT;
     }
+
+    if (fDebug)
+        LogPrintf("GetCoinYearReward(): no matches for if clauses, returning 0 percent");
     
     // default reward if nothing matches
     return 0 * CENT;
