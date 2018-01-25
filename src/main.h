@@ -1318,6 +1318,12 @@ inline double GetCoinSupplyFromAmount(int64_t amount)
 }
 
 // returns percentage reward per year
+// in the case of max supply, return 0 percent.
+// before StabilitySoftFork, return 1200%
+// after this, there is a possibility of returning super blocks of 1200%, was incorrectly done against MAX_MONEY, before ThreeOhFix
+// after ThreeOhFix it fixed to correctly have a max potential of TWENTY_BILLION
+// after the StabilitySoftFork and between ThreeOhFix, the divisor was incorrect as it was a "satoshi" divisor.
+// after the ThreeOhFix it is properly using the TWENTY_BILLION divisor. 
 inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
     int nCurrentHeight = pindex->nHeight;
@@ -1392,7 +1398,11 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     return 0 * CENT;
 }
 
-// returns the minimum stake age based on 8 hours of time
+// returns minimum stake age of 8 hours before StabilitySoftFork
+// after this, there is a possibility of instant maturation, was incorrectly done against MAX_MONEY, before ThreeOhFix
+// after ThreeOhFix it fixed to correctly have a max potential of TWENTY_BILLION
+// after the StabilitySoftFork and between ThreeOhFix, the nMultiplier value was incorrect as it was a HUNDRED_MILLION. (56 days in hours at 17b supply, for example.)
+// after the ThreeOhFix the nMulitiplier is properly using the a ONE_BILLION multiplier. (5.6 days in hours at 17b supply, for example.)
 inline int GetMinStakeAge(CBlockIndex* pindex)
 {
     int nHours = 8;
