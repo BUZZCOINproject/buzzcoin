@@ -1109,7 +1109,12 @@ int64_t GetProofOfWorkReward(int64_t nFees, CBlockIndex* pindex)
 // stakers's coin stake reward
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pindex)
 {
-    int64_t nSubsidy;
+    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
+
+    if (fCurrentSupply >= TWENTY_BILLION) {
+        LogPrintf("GetProofOfStakeReward(): Max supply reached or exceeded, no more staking rewards at fCurrentSupply=%.8f", fCurrentSupply);
+        return 0;
+    }
 
     // So basically, we're getting the number of coin per year, divided by the number
     // of days in a year, multiplied by the coin age (in days) of the stake (prorata).
@@ -1123,9 +1128,8 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, CBlockIndex* pind
     // coinAge is the age in days
     // reward will be maturation time + age in days they were staking multiplied by the percentage
     // calculated above.
+    int64_t nSubsidy;
     nSubsidy = nCoinAge * GetCoinYearReward(pindex) * 33 / (365 * 33 + 8);
-
-    double fCurrentSupply = GetCoinSupplyFromAmount(pindex->pprev ? pindex->pprev->nMoneySupply : pindex->nMoneySupply);
 
     // if the subsidy amount plus the current supply goes over 20b
     // it is nice to give this reward still, just ensure that it does not exceed
