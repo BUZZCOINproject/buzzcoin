@@ -1391,7 +1391,7 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
         if (fDebug)
             LogPrintf("GetCoinYearReward(): yearReward=%.8f\n threeohfix", 1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)));
         
-        return max(1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)), 2.5) * CENT;
+        return 1200 - (1200 * (fCurrentSupply/TWENTY_BILLION)) * CENT;
     }
 
     if (fDebug)
