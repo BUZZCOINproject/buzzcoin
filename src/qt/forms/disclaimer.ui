@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>370</height>
+    <width>586</width>
+    <height>511</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,8 +50,8 @@
     <rect>
      <x>30</x>
      <y>40</y>
-     <width>451</width>
-     <height>231</height>
+     <width>531</width>
+     <height>211</height>
     </rect>
    </property>
    <property name="lineWidth">
@@ -73,7 +73,7 @@ Even then, by using BUZZ you acknowledge the inherent risks within the cryptocur
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>290</y>
+     <y>430</y>
      <width>87</width>
      <height>20</height>
     </rect>
@@ -85,8 +85,8 @@ Even then, by using BUZZ you acknowledge the inherent risks within the cryptocur
   <widget class="QPushButton" name="pbAG">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>320</y>
+     <x>400</x>
+     <y>460</y>
      <width>150</width>
      <height>32</height>
     </rect>
@@ -101,8 +101,8 @@ Even then, by using BUZZ you acknowledge the inherent risks within the cryptocur
   <widget class="QPushButton" name="pbDNA">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>320</y>
+     <x>240</x>
+     <y>460</y>
      <width>150</width>
      <height>32</height>
     </rect>
@@ -112,6 +112,85 @@ Even then, by using BUZZ you acknowledge the inherent risks within the cryptocur
    </property>
    <property name="default">
     <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>360</y>
+     <width>461</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="inputMethodHints">
+    <set>Qt::ImhMultiLine</set>
+   </property>
+   <property name="text">
+    <string>If you wish to support our project you can set the fee to a higher amount. Thank you for your contribution!</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>320</y>
+     <width>511</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <italic>false</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(180, 0, 2);</string>
+   </property>
+   <property name="inputMethodHints">
+    <set>Qt::ImhMultiLine</set>
+   </property>
+   <property name="text">
+    <string>A minimum of 5% is mandatory and any attempts to manipulate this wallet are subject to legal persecution.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>260</y>
+     <width>511</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="lineWidth">
+    <number>1</number>
+   </property>
+   <property name="text">
+    <string>You are donating a  percentage of your staking rewards to fund development. Donations only take place after 17b supply. These funds will be used to pay for costs including: development, infrastructure, project materials, marketing and more.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
