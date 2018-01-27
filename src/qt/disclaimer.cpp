@@ -34,7 +34,7 @@ void disclaimer::reject()
     QDialog::reject();
     
     QSettings settings;
-    settings.setValue("disclaimer/agreed", false);
+    settings.setValue("disclaimer/agreed_threeoh", false);
     
     QCoreApplication::quit();
 }
@@ -59,9 +59,9 @@ void disclaimer::performAction()
     QSettings settings;
     Qt::CheckState state = ui->agreeCb->checkState();
     if (state == Qt::Checked) {
-        settings.setValue("disclaimer/agreed", true);
+        settings.setValue("disclaimer/agreed_threeoh", true);
     } else {
-        settings.setValue("disclaimer/agreed", false);
+        settings.setValue("disclaimer/agreed_threeoh", false);
         QCoreApplication::quit();
     }
 
