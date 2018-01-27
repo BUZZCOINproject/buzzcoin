@@ -315,6 +315,16 @@ void BitcoinGUI::createActions()
     openRPCConsoleAction = new QAction(tr("&Debug window"), this);
     openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
 
+    /** Open BUZZcoin download page **/
+    checkForUpdateAction = new QAction(tr("&Check for update"), this);
+    checkForUpdateAction->setToolTip(tr("Open BUZZcoin download page"));
+    connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(checkForUpdate()));
+    
+    /** Open BUZZcoin bootstrap folder **/
+    openBootstrapFolderAction = new QAction(tr("&Open bootstrap folder"), this);
+    openBootstrapFolderAction->setToolTip(tr("Open BUZZcoin bootstrap folder"));
+    connect(openBootstrapFolderAction, SIGNAL(triggered()), this, SLOT(openBootstrapFolder()));
+
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(charityAction, SIGNAL(triggered()), this, SLOT(charityClicked()));
@@ -354,6 +364,8 @@ void BitcoinGUI::createMenuBar()
     settings->addAction(optionsAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
+    help->addAction(checkForUpdateAction);
+    help->addAction(openBootstrapFolderAction);
     help->addAction(openRPCConsoleAction);
     help->addSeparator();
     help->addAction(disclaimerAction);
@@ -1118,6 +1130,17 @@ void BitcoinGUI::updateStakingIcon()
         else
             labelStakingIcon->setToolTip(tr("Not staking"));
     }
+}
+
+void BitcoinGUI::checkForUpdate()
+{
+    QDesktopServices::openUrl(QUrl("https://www.buzzcoin.info/download/", QUrl::TolerantMode));
+}
+
+void BitcoinGUI::openBootstrapFolder()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDesktopServices::openUrl(QUrl(path, QUrl::TolerantMode));
 }
 
 void BitcoinGUI::detectShutdown()

@@ -96,7 +96,9 @@ private:
     QAction *lockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
-
+    QAction *checkForUpdateAction;
+    QAction *openBootstrapFolderAction;
+    
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
     TransactionView *transactionView;
@@ -179,6 +181,12 @@ private slots:
     /** Show disclaimer dialog */
     void showDisclaimer();
 
+    /** Open Update Page **/
+    void checkForUpdate();
+    
+    /** Open Bootstrap Folder **/
+    void openBootstrapFolder();
+    
     void showEvent(QShowEvent *event);
 
 #ifndef Q_OS_MAC
