@@ -17,6 +17,10 @@ class SignVerifyMessageDialog;
 class Notificator;
 class RPCConsole;
 
+#ifdef USE_UNITTEST
+class UnitTestDialog;
+#endif
+
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QModelIndex;
@@ -103,7 +107,12 @@ private:
     Notificator *notificator;
     TransactionView *transactionView;
     RPCConsole *rpcConsole;
-
+    
+#ifdef USE_UNITTEST
+    QAction *unitTestDialogAction;
+    UnitTestDialog *unitTestDialog;
+#endif
+    
     QMovie *syncIconMovie;
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;

@@ -35,6 +35,10 @@
 #include "init.h"
 #include "ui_interface.h"
 
+#ifdef USE_UNITTEST
+#include "unittestdialog.h"
+#endif
+
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
@@ -212,6 +216,12 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     // prevents an oben debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
 
+#ifdef USE_UNITTEST
+    unitTestDialog = new UnitTestDialog(this);
+    connect(unitTestDialogAction, SIGNAL(triggered()), unitTestDialog, SLOT(show()));
+    connect(quitAction, SIGNAL(triggered()), unitTestDialog, SLOT(hide()));
+#endif
+
     // Clicking on "Verify Message" in the address book sends you to the verify message tab
     //connect(addressBookPage, SIGNAL(verifyMessage(QString)), this, SLOT(gotoVerifyMessageTab(QString)));
     // Clicking on "Sign Message" in the receive coins page sends you to the sign message tab
@@ -319,6 +329,11 @@ void BitcoinGUI::createActions()
     checkForUpdateAction = new QAction(tr("&Check for update"), this);
     checkForUpdateAction->setToolTip(tr("Open BUZZcoin download page"));
     connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(checkForUpdate()));
+
+#ifdef USE_UNITTEST
+    unitTestDialogAction = new QAction(tr("&Unit Tests"), this);
+    unitTestDialogAction->setToolTip(tr("Open unit test dialog"));
+#endif
     
     /** Open BUZZcoin bootstrap folder **/
     openBootstrapFolderAction = new QAction(tr("&Open bootstrap folder"), this);
@@ -371,6 +386,9 @@ void BitcoinGUI::createMenuBar()
     help->addAction(disclaimerAction);
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
+#ifdef USE_UNITTEST
+    help->addAction(unitTestDialogAction);
+#endif
 }
 
 static QWidget* makeToolBarSpacer()
