@@ -96,6 +96,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 #else
     //setUnifiedTitleAndToolBarOnMac(true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
     // Accept D&D of URIs
     setAcceptDrops(true);
@@ -337,7 +338,7 @@ void BitcoinGUI::createActions()
     
     /** Open BUZZcoin bootstrap folder **/
     openBootstrapFolderAction = new QAction(tr("&Open bootstrap folder"), this);
-    openBootstrapFolderAction->setToolTip(tr("Open BUZZcoin bootstrap folder"));
+    openBootstrapFolderAction->setToolTip(tr("Open bootstrap folder"));
     connect(openBootstrapFolderAction, SIGNAL(triggered()), this, SLOT(openBootstrapFolder()));
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
@@ -387,6 +388,7 @@ void BitcoinGUI::createMenuBar()
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
 #ifdef USE_UNITTEST
+    help->addSeparator();
     help->addAction(unitTestDialogAction);
 #endif
 }
@@ -1157,8 +1159,9 @@ void BitcoinGUI::checkForUpdate()
 
 void BitcoinGUI::openBootstrapFolder()
 {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDesktopServices::openUrl(QUrl(path, QUrl::TolerantMode));
+    boost::filesystem::path path = GetDataDir(false);
+    QUrl item = QUrl::fromLocalFile(path.c_str());
+    QDesktopServices::openUrl(QUrl::fromLocalFile(path.c_str()));
 }
 
 void BitcoinGUI::detectShutdown()
