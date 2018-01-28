@@ -4,9 +4,12 @@
 #include "clientmodel.h"
 #include "notificator.h"
 #include "version.h"
+#include "wallet.h"
 
 #include "main.h"
 #include "init.h"
+#include "walletmodel.h"
+#include "addresstablemodel.h"
 
 #include <QSettings>
 #include <QTimer>
@@ -24,7 +27,7 @@ disclaimer::~disclaimer()
     delete ui;
 }
 
-void disclaimer::setModel(ClientModel *model)
+void disclaimer::setModel(WalletModel *model)
 {
     this->model = model;
 }
@@ -34,7 +37,7 @@ void disclaimer::reject()
     QDialog::reject();
     
     QSettings settings;
-    settings.setValue("disclaimer/agreed", false);
+    settings.setValue("disclaimer/agreed_threeoh", false);
     
     QCoreApplication::quit();
 }
@@ -59,10 +62,18 @@ void disclaimer::performAction()
     QSettings settings;
     Qt::CheckState state = ui->agreeCb->checkState();
     if (state == Qt::Checked) {
-        settings.setValue("disclaimer/agreed", true);
+        settings.setValue("disclaimer/agreed_threeoh", true);
     } else {
-        settings.setValue("disclaimer/agreed", false);
+        settings.setValue("disclaimer/agreed_threeoh", false);
         QCoreApplication::quit();
     }
 
+}
+void disclaimer::addDevFeeAccountToAddressBook()
+{
+    AddressTableModel *model = this->model->getAddressTableModel();
+    QString devfeeadr = QString::fromStdString(pwalletMain->StakeForCharityAddress);
+    if (model->lookupAddress(devfeeadr) == -1) {
+        model->addRow(AddressTableModel::Send, tr("Buzzcoin Developer Fee"), devfeeadr);
+    }
 }

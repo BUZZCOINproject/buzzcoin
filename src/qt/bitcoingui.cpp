@@ -35,6 +35,10 @@
 #include "init.h"
 #include "ui_interface.h"
 
+#ifdef USE_UNITTEST
+#include "unittestdialog.h"
+#endif
+
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
@@ -92,6 +96,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 #else
     //setUnifiedTitleAndToolBarOnMac(true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
     // Accept D&D of URIs
     setAcceptDrops(true);
@@ -212,6 +217,12 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     // prevents an oben debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
 
+#ifdef USE_UNITTEST
+    unitTestDialog = new UnitTestDialog(this);
+    connect(unitTestDialogAction, SIGNAL(triggered()), unitTestDialog, SLOT(show()));
+    connect(quitAction, SIGNAL(triggered()), unitTestDialog, SLOT(hide()));
+#endif
+
     // Clicking on "Verify Message" in the address book sends you to the verify message tab
     //connect(addressBookPage, SIGNAL(verifyMessage(QString)), this, SLOT(gotoVerifyMessageTab(QString)));
     // Clicking on "Sign Message" in the receive coins page sends you to the sign message tab
@@ -315,6 +326,21 @@ void BitcoinGUI::createActions()
     openRPCConsoleAction = new QAction(tr("&Debug window"), this);
     openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
 
+    /** Open BUZZcoin download page **/
+    checkForUpdateAction = new QAction(tr("&Check for update"), this);
+    checkForUpdateAction->setToolTip(tr("Open BUZZcoin download page"));
+    connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(checkForUpdate()));
+
+#ifdef USE_UNITTEST
+    unitTestDialogAction = new QAction(tr("&Unit Tests"), this);
+    unitTestDialogAction->setToolTip(tr("Open unit test dialog"));
+#endif
+    
+    /** Open BUZZcoin bootstrap folder **/
+    openBootstrapFolderAction = new QAction(tr("&Open bootstrap folder"), this);
+    openBootstrapFolderAction->setToolTip(tr("Open bootstrap folder"));
+    connect(openBootstrapFolderAction, SIGNAL(triggered()), this, SLOT(openBootstrapFolder()));
+
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(charityAction, SIGNAL(triggered()), this, SLOT(charityClicked()));
@@ -354,11 +380,17 @@ void BitcoinGUI::createMenuBar()
     settings->addAction(optionsAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
+    help->addAction(checkForUpdateAction);
+    help->addAction(openBootstrapFolderAction);
     help->addAction(openRPCConsoleAction);
     help->addSeparator();
     help->addAction(disclaimerAction);
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
+#ifdef USE_UNITTEST
+    help->addSeparator();
+    help->addAction(unitTestDialogAction);
+#endif
 }
 
 static QWidget* makeToolBarSpacer()
@@ -563,7 +595,7 @@ void BitcoinGUI::charityClicked()
 void BitcoinGUI::showDisclaimer()
 {
     disclaimer dlg;
-    dlg.setModel(clientModel);
+    dlg.setModel(walletModel);
     dlg.exec();
 }
 
@@ -1091,8 +1123,7 @@ void BitcoinGUI::updateStakingIcon()
 {
     updateWeight();
 
-    if (nLastCoinStakeSearchInterval && nWeight/COIN > 0)
-    {
+    if (nLastCoinStakeSearchInterval && nWeight/COIN > 0) {
         uint64_t nWeight = this->nWeight;
         uint64_t nNetworkWeight = GetPoSKernelPS();
 
@@ -1101,23 +1132,33 @@ void BitcoinGUI::updateStakingIcon()
 
         labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_on" : ":/icons/staking_on").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
         labelStakingIcon->setToolTip(tr("Staking.<br>Your weight is %1<br>Network weight is %2").arg(nWeight).arg(nNetworkWeight));
-    }
-    else
-    {
+    } else {
         labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_off" : ":/icons/staking_off").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
-        if (pwalletMain && pwalletMain->IsLocked())
+        
+        if (pwalletMain && pwalletMain->IsLocked()) {
             labelStakingIcon->setToolTip(tr("Not staking because wallet is locked"));
-        else if (vNodes.empty())
+        } else if (vNodes.empty()) {
             labelStakingIcon->setToolTip(tr("Not staking because wallet is offline"));
-        else if (IsInitialBlockDownload())
+        } else if (IsInitialBlockDownload()) {
             labelStakingIcon->setToolTip(tr("Not staking because wallet is syncing"));
-        else if (nWeight/COIN == 0)
-            labelStakingIcon->setToolTip(tr("You are staking dust"));
-        else if (nWeight/COIN < 0)
+        } else if (nWeight/COIN == 0 || !nWeight) {
             labelStakingIcon->setToolTip(tr("Not staking because you don't have mature coins"));
-        else
+        } else {
             labelStakingIcon->setToolTip(tr("Not staking"));
+        }
     }
+}
+
+void BitcoinGUI::checkForUpdate()
+{
+    QDesktopServices::openUrl(QUrl("https://www.buzzcoin.info/download/", QUrl::TolerantMode));
+}
+
+void BitcoinGUI::openBootstrapFolder()
+{
+    boost::filesystem::path path = GetDataDir(false);
+    QString item_string = QString::fromStdString(path.string());
+    QDesktopServices::openUrl(QUrl::fromLocalFile(item_string));
 }
 
 void BitcoinGUI::detectShutdown()

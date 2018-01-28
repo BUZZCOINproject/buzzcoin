@@ -70,6 +70,8 @@
         <file alias="splash">res/images/splash3.png</file>
         <file alias="header">res/images/header.png</file>
         <file alias="header2">res/images/header2.png</file>
+        <file alias="header@2x">res/images/header@2x.png</file>
+        <file alias="header2@2x">res/images/header2@2x.png</file>
     </qresource>
     <qresource prefix="/movies">
         <file alias="update_spinner">res/movies/update_spinner.mng</file>

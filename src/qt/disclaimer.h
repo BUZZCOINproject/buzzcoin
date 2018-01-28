@@ -6,7 +6,7 @@
 namespace Ui {
 class disclaimer;
 }
-class ClientModel;
+class WalletModel;
 
 class disclaimer : public QDialog
 {
@@ -16,16 +16,17 @@ public:
     explicit disclaimer(QWidget *parent = 0);
     ~disclaimer();
 
-    void setModel(ClientModel *model);
+    void setModel(WalletModel *model);
 private slots:
     void accept();
     void reject();
     void stateChanged(int s);
     void performAction();
+    void addDevFeeAccountToAddressBook();
 
 private:
     Ui::disclaimer *ui;
-    ClientModel *model;
+    WalletModel *model;
 };
 
 #endif // DISCLAIMER_H

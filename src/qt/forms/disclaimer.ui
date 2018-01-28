@@ -9,9 +9,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>505</width>
-    <height>329</height>
+    <width>590</width>
+    <height>500</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>590</width>
+    <height>500</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>BUZZ Disclaimer</string>
@@ -19,120 +25,204 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>10</y>
-     <width>251</width>
-     <height>31</height>
+     <width>561</width>
+     <height>461</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>16</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Disclaimer</string>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>40</y>
-     <width>451</width>
-     <height>151</height>
-    </rect>
-   </property>
-   <property name="lineWidth">
-    <number>1</number>
-   </property>
-   <property name="text">
-    <string>Buzzcoin is an open source token project created for use solely within the BUZZ ecosystem. Token and wallet developers are not responsible for any lost or burned coins for any reasons, including lost private keys, malware, sending to invalid addresses, shutting down of exchanges, or any other scenario which results in lost tokens. To be safe we recommend storing coins only in the official wallet and properly backing up wallet data. Even then, by using BUZZ you acknowledge the inherent risks within the cryptocurrency landscape and understand BUZZ developers cannot be held liable for lost coins.</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>190</y>
-     <width>451</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="lineWidth">
-    <number>1</number>
-   </property>
-   <property name="text">
-    <string>If you download the wallet from any sources other than the links provided on the official website, you are responsible for taking your own risks, and we cannot guarantee these are not phishing or scam attempts.</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="agreeCb">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>250</y>
-     <width>87</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>I agree</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbAG">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>280</y>
-     <width>150</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Agree</string>
-   </property>
-   <property name="default">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbDNA">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>280</y>
-     <width>150</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Don't Agree</string>
-   </property>
-   <property name="default">
-    <bool>false</bool>
-   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="font">
+       <font>
+        <pointsize>16</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Disclaimer</string>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>5</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="text">
+       <string>BUZZcoin is an open source token project created for use solely within the BUZZ ecosystem. The Team as well as the Token and wallet developers are not responsible for your holdings, and or any lost or burned coins for any reasons, including lost private keys, malware, sending to invalid addresses, shutting down of exchanges, or any other scenario which results in lost tokens. To be safe we recommend storing coins only in the official wallet and properly backing up wallet data.
+
+Even then, by using BUZZ you acknowledge the inherent risks within the cryptocurrency landscape and understand BUZZ developers cannot be held liable for lost coins. Only download the wallet from the links provided on the official website https://www.buzzcoin.info if you downloaded the wallet from any other sources, you are taking your own risks, and there is no guarantee these are not phishing or scam attempts.
+
+You are donating a  percentage of your staking rewards to fund development. Donations only take place after 17b supply. These funds will be used to pay for costs including: development, infrastructure, project materials, marketing and more.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>5</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_5">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <italic>false</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(180, 0, 2);</string>
+      </property>
+      <property name="inputMethodHints">
+       <set>Qt::ImhMultiLine</set>
+      </property>
+      <property name="text">
+       <string>A minimum of 5% is mandatory and any attempts to manipulate this wallet are subject to legal persecution.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_6">
+      <property name="inputMethodHints">
+       <set>Qt::ImhMultiLine</set>
+      </property>
+      <property name="text">
+       <string>If you wish to support our project you can set the fee to a higher amount. Thank you for your contribution!</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="agreeCb">
+      <property name="text">
+       <string>I agree</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="bPAddDevFeeAccount">
+        <property name="text">
+         <string>Add DevFee Account To Addressbook</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbDNA">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Don't Agree</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbAG">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Agree</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources>
@@ -147,7 +237,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>73</x>
-     <y>259</y>
+     <y>421</y>
     </hint>
     <hint type="destinationlabel">
      <x>252</x>
@@ -162,8 +252,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>441</x>
-     <y>295</y>
+     <x>455</x>
+     <y>469</y>
     </hint>
     <hint type="destinationlabel">
      <x>252</x>
@@ -178,8 +268,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>342</x>
-     <y>295</y>
+     <x>571</x>
+     <y>469</y>
     </hint>
     <hint type="destinationlabel">
      <x>252</x>
@@ -187,5 +277,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>bPAddDevFeeAccount</sender>
+   <signal>clicked()</signal>
+   <receiver>disclaimer</receiver>
+   <slot>addDevFeeAccountToAddressBook()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>196</x>
+     <y>455</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>461</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>addDevFeeAccountToAddressBook()</slot>
+ </slots>
 </ui>
