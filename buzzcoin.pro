@@ -103,14 +103,14 @@ contains(USE_QRCODE, 1) {
 }
 
 # use: qmake "USE_UNITTEST=1"
-contains(USE_UNITTEST, 0) {
-    message(Building without UnitTest support)
-} else {
+contains(USE_UNITTEST, 1) {
     message(Building with UnitTest support)
     DEFINES += USE_UNITTEST
     HEADERS += src/qt/unittestdialog.h
     SOURCES += src/qt/unittestdialog.cpp
     FORMS += src/qt/forms/unittestdialog.ui
+} else {
+    message(Building without UnitTest support)
 }
 
 # use: qmake "USE_UPNP=1" ( enabled by default; default)
