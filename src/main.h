@@ -1380,7 +1380,6 @@ inline int64_t GetCoinYearReward(CBlockIndex* pindex) {
     // this block ensures that for the reward is properly divided.
     // first "if block" is between Stability Fork and less than the ThreeOhFix block
     if (nCurrentHeight < Params().ThreeOhFix()) {
-        
         if (fDebug)
             LogPrintf("GetCoinYearReward(): yearReward=%.8f\n broken after stability fork, before threeohfix", 1200 - (1200 * (fCurrentSupply/MAX_MONEY)));
 
