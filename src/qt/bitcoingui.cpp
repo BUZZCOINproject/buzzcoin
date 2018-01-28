@@ -1160,8 +1160,8 @@ void BitcoinGUI::checkForUpdate()
 void BitcoinGUI::openBootstrapFolder()
 {
     boost::filesystem::path path = GetDataDir(false);
-    QUrl item = QUrl::fromLocalFile(path.c_str());
-    QDesktopServices::openUrl(QUrl::fromLocalFile(path.c_str()));
+    QString item_string = QString::fromStdString(path.string());
+    QDesktopServices::openUrl(QUrl::fromLocalFile(item_string));
 }
 
 void BitcoinGUI::detectShutdown()
