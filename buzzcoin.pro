@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = buzzcoin-qt
-VERSION = 3.0.0.0
+VERSION = 3.1.0.0
 INCLUDEPATH += src src/json src/qt
 QT += network
 DEFINES += ENABLE_WALLET
@@ -103,7 +103,9 @@ contains(USE_QRCODE, 1) {
 }
 
 # use: qmake "USE_UNITTEST=1"
-contains(USE_UNITTEST, 1) {
+contains(USE_UNITTEST, 0) {
+    message(Building without UnitTest support)
+} else {
     message(Building with UnitTest support)
     DEFINES += USE_UNITTEST
     HEADERS += src/qt/unittestdialog.h
@@ -445,11 +447,20 @@ macx:TARGET = "BuzzCoin-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread
-macx:QMAKE_INFO_PLIST = share/qt/Info.plist
+# copy our info.plist template and replace variables, see qmake Variable Reference
+macx:QMAKE_INFO_PLIST = $$PWD/share/qt/Info.plist
+# see https://bugreports.qt-project.org/browse/QTBUG-21267
+macx:QMAKE_INFO_PLIST_OUT = $${TARGET}.app/Contents/Info.plist
+macx:PRE_TARGETDEPS +=    $${TARGET}.app/Contents/Info.plist
 macx:QMAKE_FLAGS_RPATH =
 macx:QMAKE_LFLAGS += -Wl,-rpath,/Users/andrea/Qt/5.6/clang_64/lib
 macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
-
+macx {
+    INFO_PLIST_PATH = $$shell_quote($${OUT_PWD}/$${TARGET}.app/Contents/Info.plist)
+    QMAKE_POST_LINK += /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $${VERSION}\" $${INFO_PLIST_PATH}
+    QMAKE_POST_LINK += && /usr/libexec/PlistBuddy -c \"Set CFBundleGetInfoString $${VERSION}\" $${INFO_PLIST_PATH}
+    QMAKE_POST_LINK += && /usr/libexec/PlistBuddy -c \"Set CFBundleGetInfoString $${VERSION}\" $${INFO_PLIST_PATH}
+}
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
