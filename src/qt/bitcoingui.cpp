@@ -595,7 +595,7 @@ void BitcoinGUI::charityClicked()
 void BitcoinGUI::showDisclaimer()
 {
     disclaimer dlg;
-    dlg.setModel(clientModel);
+    dlg.setModel(walletModel);
     dlg.exec();
 }
 
