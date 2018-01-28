@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
                 QTimer::singleShot(100, paymentServer, SLOT(uiReady()));
 
                 QSettings settings;
-                if (settings.value("disclaimer/agreed").toBool() != true) {
+                if (settings.value("disclaimer/agreed_threeoh").toBool() != true) {
                     // Run the user-hook (showDisclaimer) from the application event loop.
                     QTimer::singleShot(0, &window, SLOT(showDisclaimer()));
                 }

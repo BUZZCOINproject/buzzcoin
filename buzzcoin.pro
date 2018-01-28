@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = buzzcoin-qt
-VERSION = 3.0.0.0
+VERSION = 3.1.0.0
 INCLUDEPATH += src src/json src/qt
 QT += network
 DEFINES += ENABLE_WALLET
@@ -30,8 +30,8 @@ UI_DIR = build
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
-    # Mac: compile for maximum compatibility (10.8, 32-bit)
-    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.8 -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+    # Mac: compile for maximum compatibility (10.10, 64-bit)
+    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.10 -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 
     !windows:!macx {
         # Linux: static link
@@ -40,23 +40,23 @@ contains(RELEASE, 1) {
 }
 
 isEmpty(MINIUPNPC_INCLUDE_PATH) {
-    macx:MINIUPNPC_INCLUDE_PATH = /usr/local/Cellar/miniupnpc/2.0.20170509/include
+    macx:MINIUPNPC_INCLUDE_PATH = /usr/local/opt/miniupnpc/include
 }
 
 isEmpty(MINIUPNPC_LIB_PATH) {
-    macx:MINIUPNPC_LIB_PATH = /usr/local/Cellar/miniupnpc/2.0.20170509/lib
+    macx:MINIUPNPC_LIB_PATH = /usr/local/opt/miniupnpc/lib
 }
 
 isEmpty(OPENSSL_INCLUDE_PATH) {
-    macx:OPENSSL_INCLUDE_PATH = /usr/local/Cellar/openssl/1.0.2l/include
+    macx:OPENSSL_INCLUDE_PATH = /usr/local/opt/openssl/include
 }
 
 isEmpty(OPENSSL_LIB_PATH) {
-    macx:OPENSSL_LIB_PATH = /usr/local/Cellar/openssl/1.0.2l/lib
+    macx:OPENSSL_LIB_PATH = /usr/local/opt/openssl/lib
 }
 
 isEmpty(BDB_LIB_PATH) {
-    macx:BDB_LIB_PATH = /usr/local/Cellar/berkeley-db@4/4.8.30/lib
+    macx:BDB_LIB_PATH = /usr/local/opt/berkeley-db@4/lib
 }
 
 isEmpty(BDB_LIB_SUFFIX) {
@@ -64,23 +64,23 @@ isEmpty(BDB_LIB_SUFFIX) {
 }
 
 isEmpty(BDB_INCLUDE_PATH) {
-    macx:BDB_INCLUDE_PATH = /usr/local/Cellar/berkeley-db@4/4.8.30/include
+    macx:BDB_INCLUDE_PATH = /usr/local/opt/berkeley-db@4/include
 }
 
 isEmpty(BOOST_LIB_PATH) {
-    macx:BOOST_LIB_PATH = /usr/local/Cellar/boost/1.65.1/lib
+    macx:BOOST_LIB_PATH = /usr/local/opt/boost@1.60/lib
 }
 
 isEmpty(BOOST_INCLUDE_PATH) {
-    macx:BOOST_INCLUDE_PATH = /usr/local/Cellar/boost/1.65.1/include
+    macx:BOOST_INCLUDE_PATH = /usr/local/opt/boost@1.60/include
 }
 
 isEmpty(QRENCODE_INCLUDE_PATH) {
-    macx:QRENCODE_INCLUDE_PATH = /usr/local/Cellar/qrencode/4.0.0/include
+    macx:QRENCODE_INCLUDE_PATH = /usr/local/opt/qrencode/include
 }
 
 isEmpty(QRENCODE_LIB_PATH) {
-    macx:QRENCODE_LIB_PATH = /usr/local/Cellar/qrencode/4.0.0/lib
+    macx:QRENCODE_LIB_PATH = /usr/local/opt/qrencode/lib
 }
 
 !win32 {
@@ -100,6 +100,17 @@ contains(USE_QRCODE, 1) {
     message(Building with QRCode support)
     DEFINES += USE_QRCODE
     LIBS += -lqrencode
+}
+
+# use: qmake "USE_UNITTEST=1"
+contains(USE_UNITTEST, 1) {
+    message(Building with UnitTest support)
+    DEFINES += USE_UNITTEST
+    HEADERS += src/qt/unittestdialog.h
+    SOURCES += src/qt/unittestdialog.cpp
+    FORMS += src/qt/forms/unittestdialog.ui
+} else {
+    message(Building without UnitTest support)
 }
 
 # use: qmake "USE_UPNP=1" ( enabled by default; default)
@@ -427,6 +438,9 @@ windows:!contains(MINGW_THREAD_BUGFIX, 0) {
     QMAKE_LIBS_QT_ENTRY = -lmingwthrd $$QMAKE_LIBS_QT_ENTRY
 }
 
+win32 {
+    VERSION ~= s/-\d+-g[a-f0-9]{6,}//
+}
 macx:HEADERS += src/qt/macnotificationhandler.h src/qt/macdockiconhandler.h
 macx:OBJECTIVE_SOURCES += src/qt/macnotificationhandler.mm src/qt/macdockiconhandler.mm
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit
@@ -436,11 +450,20 @@ macx:TARGET = "BuzzCoin-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread
-macx:QMAKE_INFO_PLIST = share/qt/Info.plist
+# copy our info.plist template and replace variables, see qmake Variable Reference
+macx:QMAKE_INFO_PLIST = $$PWD/share/qt/Info.plist
+# see https://bugreports.qt-project.org/browse/QTBUG-21267
+macx:QMAKE_INFO_PLIST_OUT = $${TARGET}.app/Contents/Info.plist
+macx:PRE_TARGETDEPS +=    $${TARGET}.app/Contents/Info.plist
 macx:QMAKE_FLAGS_RPATH =
 macx:QMAKE_LFLAGS += -Wl,-rpath,/Users/andrea/Qt/5.6/clang_64/lib
 macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
-
+macx {
+    INFO_PLIST_PATH = $$shell_quote($${OUT_PWD}/$${TARGET}.app/Contents/Info.plist)
+    QMAKE_POST_LINK += /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $${VERSION}\" $${INFO_PLIST_PATH}
+    QMAKE_POST_LINK += && /usr/libexec/PlistBuddy -c \"Set CFBundleGetInfoString $${VERSION}\" $${INFO_PLIST_PATH}
+    QMAKE_POST_LINK += && /usr/libexec/PlistBuddy -c \"Set CFBundleGetInfoString $${VERSION}\" $${INFO_PLIST_PATH}
+}
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)

@@ -17,6 +17,10 @@ class SignVerifyMessageDialog;
 class Notificator;
 class RPCConsole;
 
+#ifdef USE_UNITTEST
+class UnitTestDialog;
+#endif
+
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QModelIndex;
@@ -96,12 +100,19 @@ private:
     QAction *lockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
-
+    QAction *checkForUpdateAction;
+    QAction *openBootstrapFolderAction;
+    
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
     TransactionView *transactionView;
     RPCConsole *rpcConsole;
-
+    
+#ifdef USE_UNITTEST
+    QAction *unitTestDialogAction;
+    UnitTestDialog *unitTestDialog;
+#endif
+    
     QMovie *syncIconMovie;
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
@@ -179,6 +190,12 @@ private slots:
     /** Show disclaimer dialog */
     void showDisclaimer();
 
+    /** Open Update Page **/
+    void checkForUpdate();
+    
+    /** Open Bootstrap Folder **/
+    void openBootstrapFolder();
+    
     void showEvent(QShowEvent *event);
 
 #ifndef Q_OS_MAC

@@ -737,7 +737,8 @@ if config.dmg is not None:
                 window.items[name].position.set(position)
         disk.close()
         if bg_path is not None:
-            subprocess.call(["SetFile", "-a", "V", bg_path])
+            st = os.stat(bg_path)
+            os.chflags(bg_path, st.st_flags ^ stat.UF_HIDDEN)
         disk.update(registering_applications=False)
         sleep(2)
         disk.eject()
