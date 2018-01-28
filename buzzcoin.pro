@@ -438,6 +438,9 @@ windows:!contains(MINGW_THREAD_BUGFIX, 0) {
     QMAKE_LIBS_QT_ENTRY = -lmingwthrd $$QMAKE_LIBS_QT_ENTRY
 }
 
+win32 {
+    VERSION ~= s/-\d+-g[a-f0-9]{6,}//
+}
 macx:HEADERS += src/qt/macnotificationhandler.h src/qt/macdockiconhandler.h
 macx:OBJECTIVE_SOURCES += src/qt/macnotificationhandler.mm src/qt/macdockiconhandler.mm
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit
