@@ -331,6 +331,11 @@ void BitcoinGUI::createActions()
     checkForUpdateAction->setToolTip(tr("Open BUZZcoin download page"));
     connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(checkForUpdate()));
 
+    // open BUZZ explorer
+    visitExplorerAction = new QAction(tr("&Visit the explorer"), this);
+    visitExplorerAction->setToolTip(tr("Open BUZZcoin download page"));
+    connect(visitExplorerAction, SIGNAL(triggered()), this, SLOT(visitExplorer()));
+
 #ifdef USE_UNITTEST
     unitTestDialogAction = new QAction(tr("&Unit Tests"), this);
     unitTestDialogAction->setToolTip(tr("Open unit test dialog"));
@@ -381,6 +386,7 @@ void BitcoinGUI::createMenuBar()
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(checkForUpdateAction);
+    help->addAction(visitExplorerAction);
     help->addAction(openBootstrapFolderAction);
     help->addAction(openRPCConsoleAction);
     help->addSeparator();
@@ -1152,6 +1158,11 @@ void BitcoinGUI::updateStakingIcon()
 void BitcoinGUI::checkForUpdate()
 {
     QDesktopServices::openUrl(QUrl("https://www.buzzcoin.info/download/", QUrl::TolerantMode));
+}
+
+void BitcoinGUI::visitExplorer()
+{
+    QDesktopServices::openUrl(QUrl("https://explorer.buzzcoin.info", QUrl::TolerantMode));
 }
 
 void BitcoinGUI::openBootstrapFolder()
