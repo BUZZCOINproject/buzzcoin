@@ -19,6 +19,11 @@ QPushButton {
     color: rgb(21,21,21);
 }
 
+QPushButton {
+    color: rgb(255,221,85);
+    background: rgb(21,21,21);
+}
+
 QDoubleSpinBox {
     background: rgb(63,67,72);
     color: rgb(255,255,255);

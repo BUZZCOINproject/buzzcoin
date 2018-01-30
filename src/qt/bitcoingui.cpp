@@ -101,6 +101,7 @@ QFile styleFile(":/styles/blackTheme");
             "QComboBox { color: rgb(255,255,255); }"
             "QComboBox QAbstractItemView::item { color: rgb(255,255,255); }"
             "QPushButton { background: rgb(255,221,85); color: rgb(21,21,21); }"
+            "QPushButton:pressed { background: rgb(21,21,21); color: rgb(255,221,85); }"
             "QDoubleSpinBox { background: rgb(63,67,72); color: rgb(255,255,255); border-color: rgb(194,194,194); }"
             "QLineEdit { background: rgb(63,67,72); color: rgb(255,255,255); border-color: rgb(194,194,194); }"
             "QTextEdit { background: rgb(63,67,72); color: rgb(255,255,255); }"
