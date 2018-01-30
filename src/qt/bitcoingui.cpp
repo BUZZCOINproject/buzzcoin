@@ -90,7 +90,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 {
     resize(800, 660);
     setWindowTitle(tr("BUZZ") + " - " + tr("Wallet"));
-QFile styleFile(":/styles/blackTheme");
+    
+    QFile styleFile(":/styles/blackTheme");
     if (styleFile.open(QFile::ReadOnly)) {
         QString BlackThemStyleSheet = QLatin1String(styleFile.readAll());
         qApp->setStyleSheet(BlackThemStyleSheet);
