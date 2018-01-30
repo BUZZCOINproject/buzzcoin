@@ -451,24 +451,13 @@ void HelpMessageBox::printToConsole()
 
 void HelpMessageBox::showOrPrint()
 {
-#if defined(WIN32)
-        // On Windows, show a message box, as there is no stderr/stdout in windowed applications
-        exec();
-#else
-        // On other operating systems, print help text to console
-        printToConsole();
-#endif
-}
-
-void SetBlackThemeQSS(QApplication& app)
-{
-    QFile styleFile(":/styles/blackTheme");
-    if (styleFile.open(QFile::ReadOnly)) {
-        QString BlackThemStyleSheet = QLatin1String(styleFile.readAll());
-        app.setStyleSheet(BlackThemStyleSheet);
-    } else {
-        app.setStyleSheet(QString(""));
-    }
+    #if defined(WIN32)
+            // On Windows, show a message box, as there is no stderr/stdout in windowed applications
+            exec();
+    #else
+            // On other operating systems, print help text to console
+            printToConsole();
+    #endif
 }
 
 } // namespace GUIUtil
