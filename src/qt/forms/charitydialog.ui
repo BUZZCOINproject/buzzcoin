@@ -231,7 +231,7 @@
     <set>Qt::ImhMultiLine</set>
    </property>
    <property name="text">
-    <string>A minimum of 5% is mandatory and any attempts to manipulate this wallet are subject to legal persecution.</string>
+    <string>A minimum of 5% is mandatory and any attempts to manipulate this wallet are subject to legal prosecution.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
