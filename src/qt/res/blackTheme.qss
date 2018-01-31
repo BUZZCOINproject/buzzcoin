@@ -111,15 +111,15 @@ QTabWidget::pane {
 }
 
 QToolButton {
-    background: rgb(24,26,30);
+    background: transparent;
     color: rgb(116,122,134);
     border: none;
     
-    border-left-color: rgb(24,26,30);
+    border-left-color: transparent;
     border-left-style: solid;
     border-left-width: 6px;
     
-    border-right-color: rgb(24,26,30);
+    border-right-color: transparent;
     border-right-style: solid;
     border-right-width: 6px;
     
