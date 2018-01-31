@@ -17,9 +17,17 @@ QComboBox QAbstractItemView::item {
 QPushButton {
     background: rgb(255,221,85);
     color: rgb(21,21,21);
+    border: none;
+    margin: 0;
+    padding: 4px 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-color: rgb(41,44,48);
+    border-width: 2px;
+    border-style: solid;
 }
 
-QPushButton {
+QPushButton:pressed {
     color: rgb(255,221,85);
     background: rgb(21,21,21);
 }
@@ -83,8 +91,8 @@ QRadioButton {
 }
 
 QTabBar::tab {
-    color: rgb(120,127,139);
-    border: 1px solid rgb(78,79,83);
+    color: rgb(255,221,85);
+    border: 1px solid rgb(255,221,85);
     border-bottom: none; padding: 5px;
 }
 
@@ -98,7 +106,7 @@ QTabBar::tab:!selected {
 }
 
 QTabWidget::pane {
-    border: 1px solid rgb(78,79,83);
+    border: 1px solid rgb(255,221,85);
 }
 
 QToolButton {
@@ -121,14 +129,15 @@ QToolButton:checked {
 }
 
 QProgressBar {
-    color: rgb(149,148,148);
-    border-color: rgb(255,255,255);
+    color: rgb(0,0,0);
+    font-weight: bold;
+    text-transform: uppercase;
     border-width: 3px;
     border-style: solid;
 }
 
 QProgressBar::chunk {
-    background: rgb(255,255,255);
+    background: rgb(255,221,85);
 }
 
 QTreeView::item {
