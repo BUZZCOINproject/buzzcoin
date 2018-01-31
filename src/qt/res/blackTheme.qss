@@ -1,5 +1,6 @@
 QWidget {
     background: rgb(41,44,48);
+    color: rgb(255,255,255);
 }
 
 QFrame {
@@ -113,9 +114,15 @@ QToolButton {
     background: rgb(24,26,30);
     color: rgb(116,122,134);
     border: none;
+    
     border-left-color: rgb(24,26,30);
     border-left-style: solid;
     border-left-width: 6px;
+    
+    border-right-color: rgb(24,26,30);
+    border-right-style: solid;
+    border-right-width: 6px;
+    
     margin-top: 8px;
     margin-bottom: 8px;
 }
@@ -123,9 +130,14 @@ QToolButton {
 QToolButton:checked {
     color: rgb(255,255,255);
     border: none;
+    
     border-left-color: rgb(255,221,85);
     border-left-style: solid;
     border-left-width: 6px;
+    
+    border-right-color: rgb(255,221,85);
+    border-right-style: solid;
+    border-right-width: 6px;
 }
 
 QProgressBar {

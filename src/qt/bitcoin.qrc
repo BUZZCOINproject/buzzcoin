@@ -1,5 +1,4 @@
 <!DOCTYPE RCC><RCC version="1.0">
-
     <qresource prefix="/styles">
         <file alias="blackTheme">res/blackTheme.qss</file>
     </qresource>
@@ -68,6 +67,7 @@
         <file alias="receive">res/icons/black/receive.png</file>
         <file alias="send">res/icons/black/send.png</file>
         <file alias="address-book">res/icons/black/address-book.png</file>
+        <file alias="address-book-slim">res/icons/black/address-book-slim.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>
