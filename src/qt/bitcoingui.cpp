@@ -495,7 +495,7 @@ void BitcoinGUI::setClientModel(ClientModel *clientModel)
             MacDockIconHandler::instance()->setIcon(QIcon(":icons/novacoin_testnet"));
         #endif
             if(trayIcon) {
-                trayIcon->setToolTip(tr("BUZZ client") + QString(" ") + tr("[testnet]"));
+                trayIcon->setToolTip(tr("BUZZ 3.1 Client") + QString(" ") + tr("[testnet]"));
                 trayIcon->setIcon(QIcon(":/icons/toolbar_testnet"));
                 toggleHideAction->setIcon(QIcon(":/icons/toolbar_testnet"));
             }

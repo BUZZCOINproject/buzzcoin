@@ -30,7 +30,11 @@ QPushButton {
 
 QPushButton:pressed {
     color: rgb(255,221,85);
-    background: rgb(21,21,21);
+    background: rgb(24,26,30);
+}
+
+QPushButton:disabled {
+    background: rgb(63,67,72);
 }
 
 QDoubleSpinBox {
@@ -66,7 +70,7 @@ QMenu {
 }
 
 QMenu::item:selected {
-    background-color: rgb(48,140,198);
+    background-color: rgb(255,221,85);
 }
 
 QLabel {
