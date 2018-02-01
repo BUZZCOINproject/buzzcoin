@@ -95,8 +95,6 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     if (styleFile.open(QFile::ReadOnly)) {
         QString BlackThemStyleSheet = QLatin1String(styleFile.readAll());
         qApp->setStyleSheet(BlackThemStyleSheet);
-    } else {
-        qApp->setStyleSheet("");
     }
 
     #ifndef Q_OS_MAC
