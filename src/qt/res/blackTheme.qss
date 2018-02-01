@@ -17,24 +17,33 @@ QComboBox QAbstractItemView::item {
 
 QPushButton {
     background: rgb(255,221,85);
-    color: rgb(21,21,21);
+    color: rgb(0,0,0);
     border: none;
     margin: 0;
     padding: 4px 8px;
     font-weight: bold;
     text-transform: uppercase;
-    border-color: rgb(41,44,48);
+}
+
+QPushButton:hover {
+    border: none;
+    background: rgb(0,0,0);
+    color: rgb(255,255,255);
     border-width: 2px;
     border-style: solid;
+    border-color: rgb(255,255,255)
 }
 
 QPushButton:pressed {
+    background: rgb(0,0,0);
     color: rgb(255,221,85);
-    background: rgb(24,26,30);
+    border-color: rgb(255,221,85);
 }
 
 QPushButton:disabled {
     background: rgb(63,67,72);
+    border: none;
+    color: rgb(194,194,194);
 }
 
 QDoubleSpinBox {
@@ -98,7 +107,8 @@ QRadioButton {
 QTabBar::tab {
     color: rgb(255,221,85);
     border: 1px solid rgb(255,221,85);
-    border-bottom: none; padding: 5px;
+    border-bottom: none;
+    padding: 5px;
 }
 
 QTabBar::tab:selected {
@@ -146,7 +156,6 @@ QToolButton:checked {
 
 QProgressBar {
     color: rgb(0,0,0);
-    font-weight: bold;
     text-transform: uppercase;
     border-width: 3px;
     border-style: solid;

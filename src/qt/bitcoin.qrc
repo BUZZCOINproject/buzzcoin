@@ -51,6 +51,7 @@
         <file alias="connect_3">res/icons/black/connect3_16.png</file>
         <file alias="connect_4">res/icons/black/connect4_16.png</file>
         <file alias="synced">res/icons/black/synced.png</file>
+        <file alias="not-synced">res/icons/black/history.png</file>
         <file alias="tx_mined">res/icons/black/tx_mined.png</file>
         <file alias="tx_input">res/icons/black/tx_input.png</file>
         <file alias="tx_output">res/icons/black/tx_output.png</file>
