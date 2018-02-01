@@ -89,7 +89,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     nWeight(0)
 {
     resize(800, 660);
-    setWindowTitle(tr("BUZZ") + " - " + tr("Wallet"));
+    setWindowTitle(tr("BUZZ v3.1.1") + " - " + tr("Wallet"));
     
     QFile styleFile(":/styles/blackTheme");
     if (styleFile.open(QFile::ReadOnly)) {
@@ -463,7 +463,7 @@ void BitcoinGUI::setClientModel(ClientModel *clientModel)
             MacDockIconHandler::instance()->setIcon(QIcon(":icons/novacoin_testnet"));
         #endif
             if(trayIcon) {
-                trayIcon->setToolTip(tr("BUZZ 3.1 Client") + QString(" ") + tr("[testnet]"));
+                trayIcon->setToolTip(tr("BUZZ v3.1.1 Client") + QString(" ") + tr("[testnet]"));
                 trayIcon->setIcon(QIcon(":/icons/toolbar_testnet"));
                 toggleHideAction->setIcon(QIcon(":/icons/toolbar_testnet"));
             }
