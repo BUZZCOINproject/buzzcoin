@@ -198,8 +198,6 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     statusBar()->addWidget(progressBarLabel);
     statusBar()->addWidget(progressBar);
 
-    syncIconMovie = new QMovie(":/movies/update_spinner_black", "mng", this);
-
     // Clicking on a transaction on the overview page simply sends you to transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
     //connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
@@ -674,8 +672,7 @@ void BitcoinGUI::setNumBlocks(int count)
 
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/black/not-synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-        if(count != prevBlocks)
-            syncIconMovie->jumpToNextFrame();
+        
         prevBlocks = count;
 
         overviewPage->showOutOfSyncWarning(true);
