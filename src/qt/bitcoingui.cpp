@@ -327,7 +327,7 @@ void BitcoinGUI::createActions()
     openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
 
     /** Open BUZZcoin download page **/
-    checkForUpdateAction = new QAction(tr("&Check for update"), this);
+    checkForUpdateAction = new QAction(tr("&Check for updates"), this);
     checkForUpdateAction->setToolTip(tr("Open BUZZcoin download page"));
     connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(checkForUpdate()));
 
@@ -384,19 +384,21 @@ void BitcoinGUI::createMenuBar()
     settings->addSeparator();
     settings->addAction(optionsAction);
 
+    QMenu *tools = appMenuBar->addMenu(tr("&Tools"));
+    tools->addAction(checkForUpdateAction);
+    tools->addAction(visitExplorerAction);
+    tools->addAction(openBootstrapFolderAction);
+    tools->addAction(openRPCConsoleAction);
+
+    #ifdef USE_UNITTEST
+        help->addSeparator();
+        help->addAction(unitTestDialogAction);
+    #endif
+
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
-    help->addAction(checkForUpdateAction);
-    help->addAction(visitExplorerAction);
-    help->addAction(openBootstrapFolderAction);
-    help->addAction(openRPCConsoleAction);
-    help->addSeparator();
     help->addAction(disclaimerAction);
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
-#ifdef USE_UNITTEST
-    help->addSeparator();
-    help->addAction(unitTestDialogAction);
-#endif
 }
 
 static QWidget* makeToolBarSpacer()
