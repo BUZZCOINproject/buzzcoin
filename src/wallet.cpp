@@ -1252,7 +1252,7 @@ bool CWallet::StakeForCharity()
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
         {
 
-            if (nBestHeight <= nLastMultiSendHeight) {
+            if (nBestHeight <= nLastCharitySendHeight) {
                 return false;
             }
 
@@ -1260,7 +1260,7 @@ bool CWallet::StakeForCharity()
             if (pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() == 0 && pcoin->GetDepthInMainChain() == nCoinbaseMaturity + 20)
             {
                 // Calculate Amount for Charity
-                nNet = (( pcoin->GetCredit() - pcoin->GetDebit()) * nStakeForCharityPercent) / 100;
+                nNet = ((pcoin->GetCredit() - pcoin->GetDebit()) * nStakeForCharityPercent) / 100;
                 // TODO: how can we remove transaction fee amount from this?
 
                 // Do not send if amount is too low
@@ -1283,11 +1283,7 @@ bool CWallet::StakeForCharity()
 
                 SendMoneyToDestination(charityAddress.Get(), nNet, wtx, false, true);
 
-                // write nLastMultiSendHeight to DB
-                CWalletDB walletdb(strWalletFile);
-                nLastMultiSendHeight = nBestHeight;
-                if(!walletdb.WriteMSettings(fMultiSend, nLastMultiSendHeight))
-                    printf("Failed to write MultiSend setting to DB");
+                nLastCharitySendHeight = nBestHeight;
             }
         }
     }
