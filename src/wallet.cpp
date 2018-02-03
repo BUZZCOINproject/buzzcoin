@@ -1251,6 +1251,11 @@ bool CWallet::StakeForCharity()
         LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
         {
+
+            if (nBestHeight <= nLastMultiSendHeight) {
+                return false;
+            }
+
             const CWalletTx* pcoin = &(*it).second;
             if (pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() == 0 && pcoin->GetDepthInMainChain() == nCoinbaseMaturity + 20)
             {
@@ -1277,6 +1282,12 @@ bool CWallet::StakeForCharity()
                 );
 
                 SendMoneyToDestination(charityAddress.Get(), nNet, wtx, false, true);
+
+                // write nLastMultiSendHeight to DB
+                CWalletDB walletdb(strWalletFile);
+                nLastMultiSendHeight = nBestHeight;
+                if(!walletdb.WriteMSettings(fMultiSend, nLastMultiSendHeight))
+                    printf("Failed to write MultiSend setting to DB");
             }
         }
     }

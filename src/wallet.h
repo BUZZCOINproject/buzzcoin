@@ -112,6 +112,7 @@ public:
 
     bool fStakeForCharity;
     int nStakeForCharityPercent;
+    int nLastMultiSendHeight;
     std::string StakeForCharityAddress;
 
     CWallet()
@@ -139,6 +140,7 @@ public:
         fStakeForCharity = true;
     	nStakeForCharityPercent = 5;
     	StakeForCharityAddress = "BRfGmqCg6kKBwWTzzMVYoq3BXp2t6oWAzx";
+        nLastMultiSendHeight = 0;
 
 	    nStakeSplitThreshold = 25000000;
 
