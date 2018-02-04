@@ -184,6 +184,8 @@ QTreeView::item {
 
 QTreeView::item:selected {
     background-color: rgb(255,221,85);
+    color: rgb(24,26,30);
+
 }
 
 QTableView {
