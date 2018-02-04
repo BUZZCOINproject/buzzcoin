@@ -384,8 +384,8 @@ void BitcoinGUI::createMenuBar()
     tools->addAction(openRPCConsoleAction);
 
     #ifdef USE_UNITTEST
-        help->addSeparator();
-        help->addAction(unitTestDialogAction);
+        tools->addSeparator();
+        tools->addAction(unitTestDialogAction);
     #endif
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
