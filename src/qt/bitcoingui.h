@@ -101,6 +101,7 @@ private:
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
     QAction *checkForUpdateAction;
+    QAction *visitExplorerAction;
     QAction *openBootstrapFolderAction;
     
     QSystemTrayIcon *trayIcon;
@@ -112,8 +113,7 @@ private:
     QAction *unitTestDialogAction;
     UnitTestDialog *unitTestDialog;
 #endif
-    
-    QMovie *syncIconMovie;
+
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
 
@@ -192,6 +192,9 @@ private slots:
 
     /** Open Update Page **/
     void checkForUpdate();
+
+    /** Open explorer **/
+    void visitExplorer();
     
     /** Open Bootstrap Folder **/
     void openBootstrapFolder();
