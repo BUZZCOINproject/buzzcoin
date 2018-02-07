@@ -81,7 +81,7 @@
 
 Even then, by using BUZZ you acknowledge the inherent risks within the cryptocurrency landscape and understand BUZZ developers cannot be held liable for lost coins. Only download the wallet from the links provided on the official website https://www.buzzcoin.info if you downloaded the wallet from any other sources, you are taking your own risks, and there is no guarantee these are not phishing or scam attempts.
 
-You are donating a  percentage of your staking rewards to fund development. Donations only take place after 17b supply. These funds will be used to pay for costs including: development, infrastructure, project materials, marketing and more.</string>
+You are donating a percentage of your staking rewards to fund development. This is not taken from your funds, but only on staking rewards generated.  These funds will be used to pay for costs including: development, infrastructure, project materials, marketing and more.</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -120,7 +120,7 @@ You are donating a  percentage of your staking rewards to fund development. Dona
        <set>Qt::ImhMultiLine</set>
       </property>
       <property name="text">
-       <string>A minimum of 5% is mandatory and any attempts to manipulate this wallet are subject to legal persecution.</string>
+       <string>A minimum of 5% is mandatory and any attempts to manipulate this wallet are subject to legal prosecution.</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -171,7 +171,7 @@ You are donating a  percentage of your staking rewards to fund development. Dona
       <item>
        <widget class="QPushButton" name="bPAddDevFeeAccount">
         <property name="text">
-         <string>Add DevFee Account To Addressbook</string>
+         <string>Add Dev Address to Addressbook</string>
         </property>
        </widget>
       </item>
